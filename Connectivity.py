@@ -3,6 +3,9 @@ from collections import deque
 from PathSolution import PathSolution
 # from Time import get_path_matrix
 
+def min_perc_conn_constraint(sol:PathSolution):
+    return 0.5 - sol.percentage_connectivity
+
 def calculate_disconnected_timesteps(sol:PathSolution):
 
     # Finds the maximum disconnected timesteps for each drone
@@ -28,6 +31,39 @@ def calculate_disconnected_timesteps(sol:PathSolution):
     # print(f"Disconnected Time Steps: {sol.disconnected_time_steps}")
 
     return sol.disconnected_time_steps
+
+
+def hovering_connectivity(sol:PathSolution):
+
+
+    info = sol.info
+
+    # Step 1: Identify hovering drones
+
+    hovering_drones = [i for i in range(info.number_of_drones) if len(sol.drone_dict[i]) < sol.time_slots]
+
+    hovering_cells = [sol.drone_dict[i][-2] for i in hovering_drones]
+
+    hovering_cells.insert(0,-1) # Add BS' position to "hovering cells"
+
+    connectivity_matrix = np.zeros((len(hovering_cells), len(hovering_cells)), dtype=int)
+
+    for i in range(len(hovering_cells)):
+        for j in range(len(hovering_cells)):
+            if i!=j and info.D[hovering_cells[i], hovering_cells[j]] <= info.comm_dist:
+                connectivity_matrix[i,j] = 1
+
+    connectivity_to_base = np.zeros(info.number_of_nodes)
+
+    connectivity_to_base[BFS(connectivity_matrix)] = 1
+
+    connectivity_to_base_percentage = sum(connectivity_to_base[1:])/(len(hovering_drones))
+
+    # Checks
+    # print(f"Drone Dict: {sol.drone_dict}\nHovering Cells: {hovering_cells}\nConnectivity Matrix:\n{connectivity_matrix}")
+    # print(f"Full Hovering Connectivity Constraint Result: {connectivity_to_base_percentage - 1}")
+
+    return connectivity_to_base_percentage
 
 
 def enforce_hovering_connectivity(sol:PathSolution):
@@ -60,7 +96,7 @@ def enforce_hovering_connectivity(sol:PathSolution):
     # print(f"Drone Dict: {sol.drone_dict}\nHovering Cells: {hovering_cells}\nConnectivity Matrix:\n{connectivity_matrix}")
     # print(f"Full Hovering Connectivity Constraint Result: {connectivity_to_base_percentage - 1}")
 
-    return connectivity_to_base_percentage - 1
+    return 1 - connectivity_to_base_percentage
 
 
 

@@ -9,7 +9,7 @@ import random
 from math import floor
 import pandas as pd
 
-from PathInput import model, test_setup_scenario, comprehensive_setup_scenarios
+from PathInput import model, test_setup_scenario
 
 # default_scenario = {
 #     'grid_size': 8,

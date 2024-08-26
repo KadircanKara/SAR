@@ -55,14 +55,16 @@ def path_smoothness_penalty(sol:PathSolution):
 
     traceback_penalty = 0
     triangle_penalty = 0
-    x_penalty = 0
+    ugly_step_penalty = 0
 
-    subpaths = [sol.drone_dict[i][:-2] if "Percentage Connectivity" in sol.info.model["F"] else sol.drone_dict[i] for i in range(sol.info.number_of_drones)]  
-    # subpaths = list(sol.drone_dict.values())
+    # subpaths = [sol.drone_dict[i][:-1] if "Percentage Connectivity" in sol.info.model["F"] else sol.drone_dict[i] for i in range(sol.info.number_of_drones)]  
+    subpaths = list(sol.drone_dict.values())
 
     path_matrix = [
         np.array([sol.get_coords(cell) for cell in drone_path]) for drone_path in subpaths
     ]
+
+    allowed_abs_angles = [45.0, 135.0, 0.0, 180.0, 90.0]
 
     for drone_path in path_matrix:
 
@@ -79,14 +81,17 @@ def path_smoothness_penalty(sol:PathSolution):
                 triangle_penalty += 1
 
         # Check for tracebacks (specific patterns of angle changes)
-        for i in range(len(angles) - 1):
-            # Specific conditions to detect tracebacks (adjust as needed)
+        for i in range(len(angles)):
+            if i < len(angles)-1:
+                # Specific conditions to detect tracebacks (adjust as needed)
+                angle_diff = angles[i+1] - angles[i]
+                if abs(angle_diff) == 180.0:
+                    traceback_penalty += 1
+            
+            if abs(angles[i]) not in allowed_abs_angles:
+                ugly_step_penalty += 1
 
-            angle_diff = angles[i+1] - angles[i]
-            if abs(angle_diff) == 180.0:
-                traceback_penalty += 1
-
-    return traceback_penalty + triangle_penalty
+    return ugly_step_penalty
 
 def longest_path_smoothness_penalty(sol:PathSolution):
 

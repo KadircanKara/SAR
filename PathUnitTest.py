@@ -13,7 +13,7 @@ from PathAnimation import PathAnimation
 from Time import *
 
 from PathOptimizationModel import moo_model_with_disconn, distance_soo_model
-from PathInput import model, algorithm, test_setup_scenario, comprehensive_setup_scenarios
+from PathInput import *
 from FilePaths import objective_values_filepath, solutions_filepath, runtimes_filepath
 from FileManagement import save_as_pickle, load_pickle
 
@@ -75,7 +75,6 @@ class PathUnitTest(object):
         t = time.time()
 
         # n_gen = 5000 if model == distance_soo_model else 200 # 1000 for SOO (Only Dist), 4000 for MOO (Dist, Conn, Disconn)
-        n_gen = 3000
 
         # termination = PathTermination(roi_threshold=0.01, patience=10)
 
@@ -126,7 +125,7 @@ class PathUnitTest(object):
             # with open(f"{runtimes_filepath}{self.scenario}_Runtime.pkl", 'wb') as pickle_file:
             #     pickle.dump(R, pickle_file)
 
-            print(f"Scenario: {str(info)}\nRuntime: {R} seconds\nObjective Values:\n{F}") # Print the results
+            print(f"Scenario: {str(info)}\nRuntime: {R} seconds\n") # Print the results
 
             if save_results:
 
@@ -143,6 +142,7 @@ class PathUnitTest(object):
                         test_anim = load_pickle(f"Results/Animations/{str(info)}-Mid-Percentage_Connectivity-Animation.pkl")
 
                     test_anim()
+                    plt.show()
 
 
 

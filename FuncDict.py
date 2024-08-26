@@ -30,6 +30,10 @@ model_metric_info = {
     'Limit Max Longest Subtour': max_longest_subtour_constr,
     'Limit Min Longest Subtour': min_longest_subtour_constr,
     'Limit Subtour Range': max_subtour_range_constr,
+    'Cell Range': limit_cell_range,
+    'Max Mission Time': max_mission_time_constr,
+    'Min Percentage Connectivity': min_perc_conn_constraint,
+    'Max Speed Violations per Drone': max_speed_violations_per_drone,
     # Equality Constraints
     'Speed Violations': calculate_speed_violations,
     'Hovering Drones Full Connectivity':enforce_hovering_connectivity,

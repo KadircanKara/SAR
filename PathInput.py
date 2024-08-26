@@ -1,10 +1,29 @@
-from PathOptimizationModel import moo_model_with_disconn, moo_model_without_disconn, distance_soo_model, moo_model_mtsp
+from PathOptimizationModel import *
+# from PathSampling import *
+# from PathMutation import *
+# from PathCrossover import *
+# from PathRepair import *
+from pymoo.core.duplicate import NoDuplicateElimination
+
 
 # CHANGE INPUTS FROM HERE !!!
 
-model = moo_model_without_disconn
+# MODEL
+model = moo_model_with_disconn
 
-algorithm = model['Alg']
+# ALG
+pop_size = 100
+n_gen = 3000
+
+# OPERATORS
+# path_sampling = PathSampling()
+# path_mutation = PathMutation()
+# path_crossover = PathCrossover()
+# path_eliminate_duplicates = NoDuplicateElimination()
+# path_repair = PathRepair()
+
+
+# algorithm = model['Alg']
 
 # if model == distance_soo_model:
 #     algorithm = 'GA'

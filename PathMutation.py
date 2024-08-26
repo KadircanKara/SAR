@@ -9,7 +9,7 @@ from copy import copy, deepcopy
 
 from PathSolution import *
 from PathInfo import *
-from PathProblem import *
+from PathProblem import PathProblem
 
 # class PathMutation(Mutation):
 #     def __init__(self, prob=0.1, mutation_info=None):
@@ -96,14 +96,15 @@ class PathMutation(Mutation):
     def __init__(self,
                 mutation_info={
                     "swap_last_point":(0, 1),
-                    "swap": (0.3, 1), # 0.5
-                    "inversion": (0.4, 1), # 1
-                    "scramble": (0.3, 1), # 0.6
+                    "swap": (0.3, 1), # 0.15
+                    "inversion": (0.4, 1), # 0.2
+                    "scramble": (0.3, 1), # 0.1
                     "insertion": (0, 1),
                     "displacement": (0, 1),
                     # "reverse sequence": (0.3, 1),
                     "block inversion": (0, 1),
                     # "shift": (0.3, 1),
+                    "sp_mutation": (1,1) # 0.15
                 }
     ) -> None:
 
@@ -122,35 +123,47 @@ class PathMutation(Mutation):
             start_points = sol.start_points
             path = np.copy(sol.path)
             mut_path = path
+            mut_start_points = np.copy(start_points)
 
             # print("Original Start Points:",start_points)
             #
             # PATH MUTATIONS
             if np.random.random() <= self.mutation_info["swap_last_point"][0] and "Percentage Connectivity" in sol.info.model["F"]:
-                    hovering_cells = [sol.drone_dict[i][-2] for i in range(sol.info.number_of_drones)]
+                    # hovering_cells = [sol.drone_dict[i][-2] for i in range(sol.info.number_of_drones)]
+                    hovering_cells = [mut_path[mut_start_points[x]-1] for x in range(1,len(mut_start_points))]
+                    hovering_cells.append(mut_path[-1])
                     # hovering_cell_indexes =[np.where(sol.path==cell) for cell in hovering_cells]
-                    for _ in range(self.mutation_info["swap_last_point"][1]):
-                        random_hovering_cell = random.choice(hovering_cells)
-                        random_hovering_cell_ind = np.where(sol.path==random_hovering_cell)[0][0]
-                        # print("-->",list(np.arange(len(sol.path))))
-                        all_cell_indices = list(np.arange(len(sol.path)))
-                        all_cell_indices.pop(random_hovering_cell_ind)
-                        swap_ind = random.choice(all_cell_indices)
-                        seq = (random_hovering_cell_ind, swap_ind)
-                        mut_path = np.hstack((
+                    random_hovering_cell = random.choice(hovering_cells)
+                    random_hovering_cell_ind = np.where(mut_path==random_hovering_cell)[0][0]
+                    # print("-->",list(np.arange(len(sol.path))))
+                    all_cell_indices = list(np.arange(len(mut_path)))
+                    # print(f"all_cell_indices: {all_cell_indices}")
+                    for hovering_cell in hovering_cells:
+                        # print(f"where hovering cell: {np.where(mut_path==hovering_cell)[0][0]}")
+                        all_cell_indices.remove(np.where(mut_path==hovering_cell)[0][0])
+                    # all_cell_indices.pop(random_hovering_cell_ind)
+                    swap_ind = random.choice(all_cell_indices)
+                    seq = sorted([random_hovering_cell_ind, swap_ind])
+                    # print(f"seq: {seq}")
+                    mut_path = np.hstack((
                         mut_path[:seq[0]], np.array([mut_path[seq[1]]]), mut_path[seq[0]+1:seq[1]], np.array([mut_path[seq[0]]]), mut_path[seq[1]+1:]
                     ))
+                    # print(f"new path len: {len(mut_path)}")
 
 
             if np.random.random() <= self.mutation_info["swap"][0]:
                 for _ in range(self.mutation_info["swap"][1]):
+                    # Exclude hovering cells
+                    hovering_cells = [mut_path[mut_start_points[x]-1] for x in range(1,len(mut_start_points))]
+                    hovering_cells.append(mut_path[-1])
                     seq = random_sequence(len(path))
+                    # print(f"seq: {seq}")
                     # print(f"swapped cells: {mut_path[seq[0]]} and {mut_path[seq[1]]}")
                     # print(f"pre-swap path: {mut_path}")
                     mut_path = np.hstack((
                         mut_path[:seq[0]], np.array([mut_path[seq[1]]]), mut_path[seq[0]+1:seq[1]], np.array([mut_path[seq[0]]]), mut_path[seq[1]+1:]
                     ))
-                    # print(f"post-swap path: {mut_path}")
+                    # print(f"post-swap path len: {len(mut_path)}")
 
 
             if np.random.random() <= self.mutation_info["inversion"][0]:
@@ -197,16 +210,21 @@ class PathMutation(Mutation):
 
             # START POINTS MUTATIONS
 
-                    # cell = np.random.choice(mut_path)
-                    # print("cell: ", cell)
-                    # cell_ind = np.where(mut_path==cell)[0][0]
-                    # print("pre-insertion: ", mut_path)
-                    # mut_path = np.delete(arr=mut_path, obj=cell, axis=0)
-                    # mut_path = np.insert(mut_path, np.random.choice(np.array([i for i in range(len(mut_path)+1) if i != cell_ind])), cell)
-                    # print("post-insertion: ", mut_path)
-
-            mut_start_points = np.copy(start_points)
-
+            if np.random.random() <= self.mutation_info["sp_mutation"][0]:
+                for _ in range(self.mutation_info["sp_mutation"][1]):
+                    sp = np.random.choice(mut_start_points[1:]) # To exclude "0"
+                    sp_ind = np.where(mut_start_points==sp)[0][0]
+                    prev_sp = mut_start_points[sp_ind-1]
+                    # print(f"sp: {sp}, prev sp: {prev_sp}")
+                    if sp_ind < len(mut_start_points) - 1:
+                        next_sp = mut_start_points[sp_ind+1]
+                    else:
+                        next_sp = len(mut_path)-1
+                    new_sp_choices = np.linspace(start=prev_sp+1, stop=next_sp-1, num=next_sp-prev_sp-1, dtype=int)
+                    # print(f"original_start_points: {start_points}, sp: {sp}, prev_sp: {prev_sp}, next_sp: {next_sp}, new_sp_choices: {new_sp_choices}")
+                    sp_new = np.random.choice(new_sp_choices)
+                    mut_start_points[sp_ind] = sp_new
+                    # print(f"original_start_points: {start_points}, sp: {sp}, new_sp_choices: {new_sp_choices}, new_sp: {sp_new}, new_start_points: {mut_start_points}")
             Y[i][0] = PathSolution(mut_path, mut_start_points, problem.info)
 
         return Y

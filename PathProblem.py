@@ -7,7 +7,6 @@ from PathInfo import *
 from Distance import *
 from Connectivity import *
 from FuncDict import *
-from PathInput import model
 from PathRepair import *
 
 from pymoo.core.problem import ElementwiseProblem
@@ -15,7 +14,7 @@ from pymoo.core.problem import ElementwiseProblem
 class PathProblem(ElementwiseProblem):
 
     def __init__(self, info:PathInfo, elementwise=True, **kwargs):
-        self.model = model # My addition
+        self.model = info.model # My addition
         self.info = info
         self.n_var = 1
         self.n_obj = len(self.model['F'])

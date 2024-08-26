@@ -17,8 +17,8 @@ import multiprocessing as mp
 from multiprocessing import Pool, cpu_count
 
 from PathInfo import *
-from PathOptimizationModel import moo_model_with_disconn, distance_soo_model
-from PathInput import model
+from PathOptimizationModel import *
+# from PathInput import model
 
 # from PathRepair import *
 
@@ -102,6 +102,7 @@ class PathSolution():
                 drone_path = (np.array(self.path) % info.number_of_cells)[self.start_points[i]:self.start_points[i + 1]]
             else:
                 drone_path = (np.array(self.path) % info.number_of_cells)[self.start_points[i]:]
+            # print(f"drone {i} path: {drone_path}")
             interpolated_first_step = interpolate_between_cities(self, -1, drone_path[0])[:-1]
             interpolated_last_step = interpolate_between_cities(self, drone_path[-1], 0)[1:]
             interpolated_last_step.append(-1)
@@ -271,22 +272,32 @@ class PathSolution():
     def do_disconnectivity_calculations(self):
 
         num_disconnected_nodes_array = np.zeros(self.time_slots)
+        drone_disconnected_times = np.zeros(self.info.number_of_nodes)
 
         for time in range(self.time_slots):
 
-            adj_mat = self.connectivity_matrix[time]
+            adj_mat = self.connectivity_matrix[time] # nxn array (n = number of nodes)
 
             # Find disconnected nodes
             disconnected_rows = np.all(adj_mat == 0, axis=1)
             # Get the indices of disconnected nodes
+            disconnected_drones = np.where(disconnected_rows)[0]
+            for drone in disconnected_drones:
+                drone_disconnected_times[drone] += 1
             num_disconnected_nodes = len(np.where(disconnected_rows)[0])
             # Update disconnected node array
             num_disconnected_nodes_array[time] = num_disconnected_nodes
 
-        self.mean_disconnected_time = np.mean(num_disconnected_nodes_array)
-        self.max_disconnected_time = np.max(num_disconnected_nodes_array)
-        self.total_disconnected_time = np.sum(num_disconnected_nodes_array)
+            # if disconnected_drones.any():
+            #     print(f"disconnected drones: {disconnected_drones}\nadj mat:\n{adj_mat}")
+
+        self.mean_disconnected_time = np.mean(drone_disconnected_times)
+        self.max_disconnected_time = np.max(drone_disconnected_times)
+        self.total_disconnected_time = np.sum(drone_disconnected_times)
         self.percentage_disconnectivity = np.sum(num_disconnected_nodes_array) / (self.time_slots * self.info.number_of_nodes)
+
+
+        # print(f"adj mat:\n{adj_mat}disconnected rows:\n{disconnected_rows}")
 
         return self.percentage_disconnectivity
 

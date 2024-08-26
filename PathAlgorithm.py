@@ -32,7 +32,7 @@ from pymoo.algorithms.soo.nonconvex.pso import PSO
 from PathOptimizationModel import *
 from PathInput import *
 
-pop_size = 200
+pop_size = pop_size
 path_sampling = PathSampling()
 path_mutation = PathMutation()
 path_crossover = PathCrossover()

@@ -8,7 +8,7 @@ moo_model_without_disconn = {
     'Exp':'time_conn',
     'Alg': "NSGA2",
     'F': ['Mission Time', 'Percentage Connectivity'], # 'Max Long Jumps per Drone'
-    'G': [], # 'Limit Subtour Range' 'Limit Long Jumps'
+    'G': ['Min Percentage Connectivity'], # 'Limit Subtour Range' 'Limit Long Jumps'
     'H': ['Speed Violations'] # 'No Long Jumps' 'Hovering Drones Full Connectivity'
 }
 
@@ -16,8 +16,8 @@ moo_model_with_disconn = {
     'Type': 'MOO',
     'Exp':'time_conn',
     'Alg': "NSGA2",
-    'F': ['Mission Time', 'Percentage Connectivity', 'Percentage Disconnectivity'], # 'Mean Disconnected Time','Max Disconnected Time','Percentage Disconnectivity'
-    'G': [], # 'Limit Subtour Range' 'Limit Long Jumps'
+    'F': ['Mission Time', 'Percentage Connectivity', 'Mean Disconnected Time','Max Disconnected Time'], # 'Mean Disconnected Time','Max Disconnected Time','Percentage Disconnectivity'
+    'G': ['Min Percentage Connectivity'], # 'Limit Subtour Range' 'Limit Long Jumps'
     'H': ['Speed Violations', 'Hovering Drones Full Connectivity'] # 'No Long Jumps' 'Enforce Hovering Connectivity' 'Search Drone Path Smoothness'
 }
 
@@ -28,7 +28,6 @@ moo_model_mtsp = {
     'F': ['Mission Time', 'Longest Subtour'],
     'G': [],
     'H': ['No Speed Violations']  # 'No Long Jumps', 'No Extra Revisits'
-
 }
 
 distance_soo_model = {

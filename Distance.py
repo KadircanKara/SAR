@@ -4,7 +4,18 @@ import copy
 
 # from Time import calculate_visit_times, get_real_paths
 
-from PathSolution import *
+from PathSolution import PathSolution
+
+def max_speed_violations_per_drone(sol:PathSolution):
+    return max(calculate_drone_long_jumps(sol)) - 2
+
+def max_mission_time_constr(sol:PathSolution):
+    return sol.mission_time - 500
+
+def limit_cell_range(sol:PathSolution):
+    path_lens = [len(x) for x in list(sol.drone_dict.values())]
+    constr = 5
+    return (max(path_lens) - min(path_lens)) - constr
 
 def limit_mission_time(sol:PathSolution):
     return sol.mission_time - 1000

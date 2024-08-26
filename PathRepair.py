@@ -41,6 +41,8 @@ class PathRepair(Repair):
             # old_anim()
             # new_anim()
 
+            # print(f"new path: {new_path}")
+
             X[k, 0] = PathSolution(new_path, np.copy(sol.start_points), sol.info, calculate_pathplan=True, calculate_connectivity=True, calculate_disconnectivity=True)
 
             # print(f"New Path Length: {len(new_path)}")

@@ -199,11 +199,12 @@ def save_paths_and_anims_from_scenario(scenario:str):
     for objective_name in F.columns:
         objective_name_with_underscore = objective_name.replace(" ", "_")
         objective_values = F[objective_name]
+        fig, axes = plt.subplots()
         if len(model["F"]) == 1: # If model is SOO
             sol = X[0]
             sol_xpath, sol_ypath = get_real_paths(sol)
             np.savez(f"{paths_filepath}{scenario}-Best-{objective_name_with_underscore}-Paths.npz", arr1=sol_xpath, arr2=sol_ypath)
-            sol_anim = PathAnimation(sol)
+            sol_anim = PathAnimation(sol, fig, axes)
             save_as_pickle(f"{animations_filepath}{scenario}-Best-{objective_name_with_underscore}-Animation.pkl", sol_anim)
         else: # If model is MOO
             # Get best, worst indices
@@ -238,9 +239,9 @@ def save_paths_and_anims_from_scenario(scenario:str):
             np.savez(f"{paths_filepath}{scenario}-Worst-{objective_name_with_underscore}-Paths.npz", arr1=worst_sol_xpath, arr2=worst_sol_ypath)
             np.savez(f"{paths_filepath}{scenario}-Mid-{objective_name_with_underscore}-Paths.npz", arr1=mid_sol_xpath, arr2=mid_sol_ypath)
             # Save best, worst and mid animations
-            best_sol_anim = PathAnimation(best_sol)
-            worst_sol_anim = PathAnimation(worst_sol)
-            mid_sol_anim = PathAnimation(mid_sol)
+            best_sol_anim = PathAnimation(best_sol, fig, axes)
+            worst_sol_anim = PathAnimation(worst_sol, fig, axes)
+            mid_sol_anim = PathAnimation(mid_sol, fig, axes)
             save_as_pickle(f"{animations_filepath}{scenario}-Best-{objective_name_with_underscore}-Animation.pkl", best_sol_anim)
             save_as_pickle(f"{animations_filepath}{scenario}-Worst-{objective_name_with_underscore}-Animation.pkl", worst_sol_anim)
             save_as_pickle(f"{animations_filepath}{scenario}-Mid-{objective_name_with_underscore}-Animation.pkl", mid_sol_anim)

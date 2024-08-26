@@ -2,7 +2,8 @@ from pymoo.core.sampling import Sampling
 import numpy as np
 from math import floor
 import random
-from PathProblem import *
+from PathSolution import *
+# from PathProblem import *
 
 '''
 TODO
@@ -20,7 +21,7 @@ class PathSampling(Sampling):
     def __init__(self) -> None:
         super().__init__()
 
-    def _do(self, problem: PathProblem, n_samples, **kwargs):
+    def _do(self, problem, n_samples, **kwargs):
 
 
         # X = np.full((n_samples, problem.n_var), 0, dtype=int)
