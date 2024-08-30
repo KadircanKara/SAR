@@ -6,8 +6,6 @@ import copy
 
 from PathSolution import PathSolution
 
-def max_speed_violations_per_drone(sol:PathSolution):
-    return max(calculate_drone_long_jumps(sol)) - 2
 
 def max_mission_time_constr(sol:PathSolution):
     return sol.mission_time - 500
@@ -154,7 +152,7 @@ def calculate_subtour_lengths(sol:PathSolution):
     return sol.subtour_lengths
 
 
-def calculate_drone_long_jumps(sol:PathSolution):
+def calculate_drone_speed_violations(sol:PathSolution):
 
     info = sol.info
     start_points = sol.start_points
@@ -169,71 +167,42 @@ def calculate_drone_long_jumps(sol:PathSolution):
                 long_jump_counter += 1
         drone_long_jump_violations.append(long_jump_counter)
 
-    sol.drone_long_jump_violations = drone_long_jump_violations
+    sol.drone_speed_violations = drone_long_jump_violations
 
-    # print(f"drone long jump violations:\n{drone_long_jump_violations}")
+    return sol.drone_speed_violations
 
-    return drone_long_jump_violations
+def limit_total_speed_violation(sol:PathSolution):
 
-    # path = np.array(sol.path)
-    # path = np.where(path != -1, path % info.number_of_cells, path)
-    # long_jump_violations = 0
-    # for i in range(len(path)-1):
-    #     if info.D[path[i], path[i+1]] > info.cell_side_length * sqrt(2):
-    #         if 
-    #         long_jump_violations += 1
-
-
-    # drone_path_matrix = sol.real_time_path_matrix[1:,:]
-    # long_jump_violations = 0
-    # drone_long_jump_violations = []
-    # for i in range(info.number_of_drones):
-    #     for j in range(drone_path_matrix.shape[1] - 1):
-    #         if info.D[drone_path_matrix[i+1,j],drone_path_matrix[i+1,j+1]] > info.cell_side_length * sqrt(2):
-    #             long_jump_violations += 1
-    #         drone_long_jump_violations.append(long_jump_violations)
-
-def calculate_max_long_jumps_per_drone(sol:PathSolution):
-
-    if not sol.drone_long_jump_violations:
-        calculate_drone_long_jumps(sol)
-
-    print(f"max long jumps: {max(sol.drone_long_jump_violations)}")
+    if sol.info.min_visits == 1:
+        return 0
+    else:
+        if not sol.drone_speed_violations:
+            calculate_drone_speed_violations(sol)
+        return sum(sol.drone_speed_violations) - (sol.info.min_visits - 1) * 10
     
-    return max(sol.drone_long_jump_violations) - 2 # Allows max 2 long jumps per drone
+def limit_max_speed_violation(sol:PathSolution):
 
-def calculate_speed_violations(sol:PathSolution):
+    if sol.info.min_visits == 1:
+        return 0
+    else:
+        if not sol.drone_speed_violations:
+            calculate_drone_speed_violations(sol)
+        return max(sol.drone_speed_violations) - (sol.info.min_visits - 1) * 4
+    
 
-    # info = sol.info
-    # start_points = sol.start_points
-    # sol.speed_violations = 0
-    # for drone_path in sol.real_time_path_matrix:
-    #     drone_speed_violations = sum([int(bool(info.D[drone_path[i],drone_path[i+1]] > info.cell_side_length*sqrt(2))) for i in range(len(drone_path)-1)]) 
-    #     sol.speed_violations += drone_speed_violations
-    #     # print(f"drone path: {drone_path}\ndrone speed iolations: {drone_speed_violations}")
-    # return sol.speed_violations
+def speed_violations_as_objective(sol:PathSolution):
+    if not sol.drone_speed_violations:
+        calculate_drone_speed_violations(sol)
+    if sol.info.min_visits == 1:
+        return 0
+    else:
+        return np.sum(sol.drone_speed_violations)
 
-    path = np.array(sol.path)
-    info = sol.info
-    path = np.where(path != -1, path % info.number_of_cells, path)
-    sol.speed_violations = 0
-    # print(f"path: {path}")
-    for i in range(len(path)-1):
-        if info.D[path[i], path[i+1]] > info.cell_side_length * sqrt(2):
-            sol.speed_violations += 1
-    return sol.speed_violations
 
 
 def min_cells_per_drone_constr(sol:PathSolution):
 
     info = sol.info
-
-    # if "Percentage Connectivity" not in info.model["F"]: # More like mtsp, so the drones' flight times may be closer to each other
-    #     start_points = sol.start_points
-    #     last_start_point_subtractor = info.min_visits * info.number_of_cells
-    # else:
-    #     start_points = sol.start_points[::] # 1 drone will fly significantly more and others will end the tour early to contribute to percentage connectivity
-    #     last_start_point_subtractor = sol.start_points[-1]
 
     start_points = sol.start_points
     last_start_point_subtractor = info.min_visits * info.number_of_cells
@@ -249,13 +218,6 @@ def min_cells_per_drone_constr(sol:PathSolution):
     constr = (info.number_of_cells * info.min_visits // info.number_of_drones) - 1
 
     cv = -min(cells_per_drone) + constr
-
-    # print(f"min cells per drone cv: {cv}")
-    # print(f"start points: {sol.start_points}")
-
-
-    # print("start_points:", start_points)
-    # print(f"constr: {constr}  max cells per drone: {max(cells_per_drone)}")
 
     return cv
 
@@ -304,23 +266,6 @@ def min_cells_per_drone_constr(sol:PathSolution):
     # return sol.cells_per_drone_constr
 
 
-def long_jumps_eq_constr(sol:PathSolution):
-    calculate_speed_violations(sol)
-
-def long_jumps_ieq_constr(sol:PathSolution, constr=28):
-
-    info = sol.info
-
-    # Allow one or two long jumps per drone
-
-    constr = sol.info.number_of_drones * 2
-
-    info = sol.info
-
-    if not sol.long_jump_violations :
-        calculate_speed_violations(sol)
-
-    return sol.long_jump_violations - constr
 
 
     # constr = (7*info.min_visits) * info.number_of_drones

@@ -6,12 +6,15 @@ from FilePaths import *
 from FileManagement import *
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 
 from PathAnimation import PathAnimation
 from PathSolution import PathSolution
 from Time import get_real_paths
 from Connectivity import calculate_disconnected_timesteps
 from PathInput import *
+from PathInfo import *
 
 
 def list_files(directory):
@@ -21,6 +24,34 @@ def list_files(directory):
         for filename in filenames:
             files.append(os.path.join(dirpath, filename))
     return files
+
+
+def animate_extreme_point_paths(info:PathInfo):
+
+    scenario = str(info)
+    directions = ["Best", "Mid", "Worst"]
+    objectives = [x.replace(" ", "_") for x in info.model["F"]]
+
+    # Iterate through each objective
+    for obj in objectives:
+        fig, axes = plt.subplots(1, 3, figsize=(15, 5))  # Create subplots with 1 row and 3 columns
+        fig.suptitle(f"Obj: {model['Exp']}, Alg: {model['Alg']}, Gen: {info.n_gen}, Pop: {info.pop_size}, n={info.number_of_drones}, r={info.comm_cell_range}, v:{info.min_visits}")
+        # title = f"{direction} {obj.replace('_',' ')} Paths"
+        animations = []  # Store all animations to prevent garbage collection
+
+        for ax, direction in zip(axes, directions):
+            ax.set_title(f"{direction} {obj.replace('_',' ')} Paths")
+            sol = load_pickle(f"Results/Solutions/{scenario}-{direction}-{obj}-Solution.pkl")
+            anim_object = PathAnimation(sol, fig, ax)
+            anim = FuncAnimation(
+                fig, anim_object.update, frames=anim_object.paths[0].shape[1],
+                init_func=anim_object.initialize_figure, blit=False, interval=0
+            )
+            animations.append(anim)  # Store the animation object
+
+        plt.tight_layout()
+        plt.show()
+
 
 
 def plot_total_distance_vs_pecentage_connectivity(direction:str, obj:str):
@@ -181,11 +212,6 @@ def plot_total_distance_vs_pecentage_connectivity(direction:str, obj:str):
     # F = load_pickle(f"{objective_values_filepath}{scenario}-ObjectiveValues.pkl")
     # distance_and_connectivity_values = F[["Total Distance","Percentage Connectivity"]]
     #
-
-# plot_total_distance_vs_pecentage_connectivity("Mid", "Total Distance")
-# plot_total_distance_vs_pecentage_connectivity("Mid", "Percentage Connectivity")
-# plot_total_distance_vs_pecentage_connectivity("Mid", "Mean Disconnected Time")
-# plot_total_distance_vs_pecentage_connectivity("Mid", "Max Disconnected Time")
 
 
 def save_paths_and_anims_from_scenario(scenario:str):

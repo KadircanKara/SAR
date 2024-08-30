@@ -16,6 +16,25 @@ DONE not yet
 
 '''
 
+class AdaptiveRelaySampling(Sampling):
+
+    def __init__(self) -> None:
+        super().__init__()
+
+    def _do(self, problem, n_samples, **kwargs):
+
+
+        # X = np.full((n_samples, problem.n_var), 0, dtype=int)
+        X = np.full((n_samples, problem.n_var), None, dtype=PathSolution)
+
+        cells = np.arange(problem.info.number_of_cells)
+
+        for i in range(n_samples):
+            X[i] = np.random.choice(cells, size=problem.info.number_of_drones-1, replace=False)
+
+        return X
+
+
 class PathSampling(Sampling):
 
     def __init__(self) -> None:

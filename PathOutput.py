@@ -12,11 +12,12 @@ from pymoo.indicators.hv import Hypervolume
 from pymoo.indicators.igd import IGD
 from Connectivity import *
 
-
 class PathOutput(Output):
 
     def __init__(self, problem:PathProblem):
         super().__init__()
+
+        self.problem = problem
 
         objs = problem.model["F"]
 
@@ -178,15 +179,28 @@ class PathOutput(Output):
 
 
 
-        G, H = algorithm.pop.get("G", "H")
+        G, H, F = algorithm.pop.get("G", "H", "F")
 
-        cvs = G.tolist()
+        G_cvs = np.array(G.tolist())
+        H_cvs = np.array(H.tolist())
 
-        # print(f"cvs: {cvs}")
+        cvs = np.hstack((G_cvs, H_cvs))
+        sum_cvs = np.sum(cvs, axis=0)
+
+        cvs_df = pd.DataFrame(data=cvs, columns=self.problem.model["G"]+self.problem.model["H"])
+
+        F_df = pd.DataFrame(data=F, columns=self.problem.model["F"])
+
+        print(f"Constraint Violations:\n{cvs_df}")
+        # print(f"Objective Values:\n{F_df}")
+
+        # print(f"Constraint Violations:\n{cvs_df}\nObjective Values:\n{F_df}")
+
+        # print(f"Smoothness Constraints:\n{np.hstack((G_cvs[:,1], H_cvs[:,1]))}")
         
         if not all(isinstance(i, list) and len(i) == 0 for i in cvs):
-            self.cv_min.set(int(min(cvs)[0]))
-            self.cv_avg.set(np.mean(cvs))
+            self.cv_min.set(np.min(sum_cvs))
+            self.cv_avg.set(np.mean(sum_cvs))
 
         # FROM MULTI
 

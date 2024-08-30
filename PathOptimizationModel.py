@@ -14,11 +14,11 @@ moo_model_without_disconn = {
 
 moo_model_with_disconn = {
     'Type': 'MOO',
-    'Exp':'time_conn',
+    'Exp':'time_conn_disconn',
     'Alg': "NSGA2",
     'F': ['Mission Time', 'Percentage Connectivity', 'Mean Disconnected Time','Max Disconnected Time'], # 'Mean Disconnected Time','Max Disconnected Time','Percentage Disconnectivity'
-    'G': ['Min Percentage Connectivity'], # 'Limit Subtour Range' 'Limit Long Jumps'
-    'H': ['Speed Violations', 'Hovering Drones Full Connectivity'] # 'No Long Jumps' 'Enforce Hovering Connectivity' 'Search Drone Path Smoothness'
+    'G': ['Min Percentage Connectivity', 'Limit Total Speed Violation'], # 'Limit Speed Violations' 'Limit Subtour Range' 'Limit Long Jumps'
+    'H': ['Hovering Drones Full Connectivity'] # 'No Long Jumps' 'Enforce Hovering Connectivity' 'Search Drone Path Smoothness'
 }
 
 moo_model_mtsp = {

@@ -9,7 +9,7 @@ import random
 from math import floor
 import pandas as pd
 
-from PathInput import model, test_setup_scenario
+from PathInput import *
 
 # default_scenario = {
 #     'grid_size': 8,
@@ -32,6 +32,8 @@ class PathInfo(object):
     def __init__(self, scenario_dict=None) -> None:
 
         self.model = model
+        self.pop_size = pop_size
+        self.n_gen = n_gen
 
         # print("-->", scenario_dict)
         self.grid_size = scenario_dict['grid_size'] if scenario_dict else test_setup_scenario['grid_size']

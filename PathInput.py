@@ -39,7 +39,7 @@ test_setup_scenario = {
 'number_of_drones': 8,
 'max_drone_speed': 2.5, # m/s
 'comm_cell_range': 2,  # 2 cells
-'min_visits': 1,  # Minimum number of cell visits
+'min_visits': 2,  # Minimum number of cell visits
 'max_visits':5, # Maximum number of cell visits
 'number_of_targets': 1,
 'target_positions':12,

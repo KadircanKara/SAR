@@ -47,7 +47,7 @@ class PathSolution():
             f"Objective Values: totaldistance_{self.total_distance}_longestSubtour_{self.longest_subtour}_percentageConumber_of_nodesectivity_{self.percentage_connectivity}\n" \
             f"Chromosome: pathSequenumber_of_cellse_{self.path}_startPoints_{self.start_points}"
 
-    def __init__(self, path, start_points, info:PathInfo, calculate_pathplan=True, calculate_connectivity=True, calculate_disconnectivity=True):
+    def __init__(self, path, start_points,  info:PathInfo, calculate_pathplan=True, calculate_connectivity=True, calculate_disconnectivity=True):
 
         # self.hovering = info.hovering
         # self.realtime_conumber_of_nodesectivity = info.realtime_conumber_of_nodesectivity
@@ -55,6 +55,7 @@ class PathSolution():
         # Inputs
         self.path = path
         self.start_points = start_points
+        # self.relay_positions = relay_positions
         self.info: PathInfo = info
 
         # print(f'path: {self.path}')
@@ -72,11 +73,16 @@ class PathSolution():
         self.longest_subtour = None
         self.shortest_subtour = None
         self.subtour_range = None
+        self.drone_speed_violations = None
 
         # Connectivity
         self.connectivity_matrix = None
         self.disconnected_time_steps = None
         self.percentage_connectivity = None
+
+        # Smoothness
+        self.drone_path_smoothness_penalties = None
+        self.drone_tracebacks = None
 
         if calculate_pathplan:
             self.get_drone_dict()
@@ -152,17 +158,17 @@ class PathSolution():
         Nd, time_steps = self.real_time_path_matrix.shape
         Nd -= 1 # Remove base station
 
-        subtour_lengths = dict()
+        self.subtour_lengths = dict()
 
         for i in range(info.number_of_drones):
             drone_path = self.real_time_path_matrix[i+1]
             drone_dist = 0
             for j in range(time_steps-1):
                 drone_dist += info.D[drone_path[j],drone_path[j+1]]
-            subtour_lengths[i] = drone_dist
+            self.subtour_lengths[i] = drone_dist
 
-        self.total_distance = sum(subtour_lengths.values())
-        self.longest_subtour = max(subtour_lengths.values())
+        self.total_distance = sum(self.subtour_lengths.values())
+        self.longest_subtour = max(self.subtour_lengths.values())
 
         # APPLY HOVERING TO DRONES WITH SHORTER PATHS (ONLY IF MOO)
 
