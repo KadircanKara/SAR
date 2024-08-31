@@ -10,8 +10,8 @@ from PathAnimation import PathAnimation
 
 # Initialize the PathInfo object
 info = PathInfo(test_setup_scenario)
-scenario = str(info)
 
+scenario = str(info)
 directions = ["Best", "Mid", "Worst"]
 objectives = [x.replace(" ", "_") for x in info.model["F"]]
 
@@ -34,44 +34,3 @@ for obj in objectives:
 
     plt.tight_layout()
     plt.show()
-
-
-'''import os
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
-from PathOptimizationModel import moo_model_with_disconn, distance_soo_model
-from PathSolution import PathSolution
-from PathInfo import PathInfo
-from FileManagement import load_pickle
-from PathInput import test_setup_scenario
-from PathAnimation import PathAnimation
-
-# Clear the terminal
-os.system('clear')
-
-# Initialize the PathInfo object
-info = PathInfo(test_setup_scenario)
-info.comm_cell_range = 2
-scenario = str(info)
-
-directions = ["Best", "Mid", "Worst"]
-objectives = [x.replace(" ", "_") for x in info.model["F"]]
-
-# Set up the figure and subplots
-# plt.figure(figsize=(15, 5))  # Set the overall figure size
-
-for obj in objectives:
-    fig = plt.figure()  # You can adjust the size as needed
-    print(f"Animating: {obj}")
-    num = 0
-    for direction in directions:
-        num+=1
-        plt.subplot(1, 3, num)  # Create a subplot (1 row, 3 columns)
-        sol = load_pickle(f"Results/Solutions/{scenario}-{direction}-{obj}-Solution.pkl")
-        anim_object = PathAnimation(sol)
-        anim = FuncAnimation(
-            anim_object.fig, anim_object.update, frames=anim_object.paths[0].shape[1],
-            init_func=anim_object.initialize_figure, blit=True, interval=50
-        )
-    plt.show()'''

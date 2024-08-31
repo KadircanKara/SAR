@@ -61,6 +61,3 @@ class PathUnitTest(object):
         F= pd.DataFrame(abs(res.F), columns=model['F'])
         R = t_elapsed_seconds
         return res, F,X,R
-
-test = PathUnitTest(scenario=single_visit_setup_scenarios)
-test(save_results=True, animation=False)

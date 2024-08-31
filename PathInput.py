@@ -58,6 +58,22 @@ single_visit_setup_scenarios = [
     'cell_side_length': 50,
     'number_of_drones': 4,
     'max_drone_speed': 2.5, # m/s
+    'comm_cell_range': 2,  # 2 cells
+    'min_visits': 1,  # Minimum number of cell visits
+    'max_visits':5, # Maximum number of cell visits
+    'number_of_targets': 1,
+    'target_positions':12,
+    'true_detection_probability': 0.99,
+    'false_detection_probability': 0.01,
+    'detection_threshold': 0.9,
+    'max_isolated_time': 0,
+},
+
+    {
+    'grid_size': 8,
+    'cell_side_length': 50,
+    'number_of_drones': 4,
+    'max_drone_speed': 2.5, # m/s
     'comm_cell_range': 4,  # 2 cells
     'min_visits': 1,  # Minimum number of cell visits
     'max_visits':5, # Maximum number of cell visits
@@ -74,7 +90,39 @@ single_visit_setup_scenarios = [
     'cell_side_length': 50,
     'number_of_drones': 8,
     'max_drone_speed': 2.5, # m/s
+    'comm_cell_range': 2,  # 2 cells
+    'min_visits': 1,  # Minimum number of cell visits
+    'max_visits':5, # Maximum number of cell visits
+    'number_of_targets': 1,
+    'target_positions':12,
+    'true_detection_probability': 0.99,
+    'false_detection_probability': 0.01,
+    'detection_threshold': 0.9,
+    'max_isolated_time': 0,
+},
+
+    {
+    'grid_size': 8,
+    'cell_side_length': 50,
+    'number_of_drones': 8,
+    'max_drone_speed': 2.5, # m/s
     'comm_cell_range': 4,  # 2 cells
+    'min_visits': 1,  # Minimum number of cell visits
+    'max_visits':5, # Maximum number of cell visits
+    'number_of_targets': 1,
+    'target_positions':12,
+    'true_detection_probability': 0.99,
+    'false_detection_probability': 0.01,
+    'detection_threshold': 0.9,
+    'max_isolated_time': 0,
+},
+
+    {
+    'grid_size': 8,
+    'cell_side_length': 50,
+    'number_of_drones': 12,
+    'max_drone_speed': 2.5, # m/s
+    'comm_cell_range': 2,  # 2 cells
     'min_visits': 1,  # Minimum number of cell visits
     'max_visits':5, # Maximum number of cell visits
     'number_of_targets': 1,
