@@ -14,7 +14,7 @@ from Time import *
 
 from PathOptimizationModel import moo_model_with_disconn, distance_soo_model
 from PathInput import *
-from FilePaths import objective_values_filepath, solutions_filepath, runtimes_filepath
+from FilePaths import *
 from FileManagement import save_as_pickle, load_pickle
 
 
@@ -30,8 +30,10 @@ class PathUnitTest(object):
     def __call__(self, save_results=True, animation=True, *args: Any, **kwds: Any) -> Any:
 
         for info in self.info:
-            F,X,R = self.run_optimization(info)
+            print(f"Scenario: {str(info)}")
+            res, F,X,R = self.run_optimization(info)
             if save_results:
+                save_as_pickle(f"{res_filepath}{str(info)}-Res.pkl", X)
                 save_as_pickle(f"{solutions_filepath}{str(info)}-SolutionObjects.pkl", X)
                 F.to_pickle(f"{objective_values_filepath}{str(info)}-ObjectiveValues.pkl")
                 save_as_pickle(f"{runtimes_filepath}{str(info)}-Runtime.pkl", R)
@@ -58,58 +60,7 @@ class PathUnitTest(object):
         X = res.X
         F= pd.DataFrame(abs(res.F), columns=model['F'])
         R = t_elapsed_seconds
-        return F,X,R
-        # print(f"Scenario: {str(info)}\nRuntime: {R} seconds\n") # Print the results
+        return res, F,X,R
 
-
-
-    # def Optimize(self, save_results, show_anim):
-
-    #     t = time.time()
-
-    #     for info in self.info:
-
-    #         print(f"Scenario: {str(info)}")
-
-    #         t_start = time.time()
-    #         res = minimize(problem=PathProblem(info),
-    #                         algorithm=PathAlgorithm(self.algorithm)(),
-    #                         termination=('n_gen',n_gen),
-    #                         save_history=True,
-    #                         seed=1,
-    #                         output=PathOutput(PathProblem(info)),
-    #                         verbose=True,
-    #                         )
-    #         t_end = time.time()
-    #         t_elapsed_seconds = t_end - t_start
-    #         t_elapsed_minutes = t_elapsed_seconds / 60
-
-    #         X = res.X
-
-    #         F= pd.DataFrame(abs(res.F), columns=model['F'])
-
-    #         R = t_elapsed_seconds
-            
-    #         print(f"Scenario: {str(info)}\nRuntime: {R} seconds\n") # Print the results
-
-    #         if save_results:
-
-    #             save_as_pickle(f"{solutions_filepath}{str(info)}-SolutionObjects.pkl", X)
-    #             F.to_pickle(f"{objective_values_filepath}{str(info)}-ObjectiveValues.pkl")
-    #             save_as_pickle(f"{runtimes_filepath}{str(info)}-Runtime.pkl", R)
-    #             save_paths_and_anims_from_scenario(str(info))
-
-    #             if show_anim:
-
-    #                 if self.model == distance_soo_model:
-    #                     test_anim = load_pickle(f"Results/Animations/{str(info)}-Best-Total_Distance-Animation.pkl")
-    #                 else:
-    #                     test_anim = load_pickle(f"Results/Animations/{str(info)}-Mid-Percentage_Connectivity-Animation.pkl")
-
-    #                 show_anim = test_anim()
-
-    #                 plt.show()
-
-
-test = PathUnitTest(scenario=test_setup_scenario)
+test = PathUnitTest(scenario=single_visit_setup_scenarios)
 test(save_results=True, animation=False)

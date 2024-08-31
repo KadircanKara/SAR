@@ -3,8 +3,14 @@ from collections import deque
 from PathSolution import PathSolution
 # from Time import get_path_matrix
 
+# def longest_path_disconnected_time(sol:PathSolution):
+#     longest_drone_path = sol.real_time_path_matrix[sol.subtour_lengths.index(max(sol.subtour_lengths))]
+
 def min_perc_conn_constraint(sol:PathSolution):
-    return 0.5 - sol.percentage_connectivity
+    if sol.info.number_of_drones > 2:
+        return 0.5 - sol.percentage_connectivity
+    else:
+        return 0
 
 def calculate_disconnected_timesteps(sol:PathSolution):
 

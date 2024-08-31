@@ -27,7 +27,7 @@ class AdaptiveRelayProblem(ElementwiseProblem):
 
     def _evaluate(self, x, out, *args, **kwargs):
 
-        sol:PathSolution = x[0]
+        sol = x
         model = self.model
         f,g,h=[],[],[]
 

@@ -191,7 +191,7 @@ class PathOutput(Output):
 
         F_df = pd.DataFrame(data=F, columns=self.problem.model["F"])
 
-        print(f"Constraint Violations:\n{cvs_df}")
+        # print(f"Constraint Violations:\n{cvs_df}")
         # print(f"Objective Values:\n{F_df}")
 
         # print(f"Constraint Violations:\n{cvs_df}\nObjective Values:\n{F_df}")

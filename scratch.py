@@ -35,4 +35,4 @@ title = f"{direction} {obj.replace('_',' ')} Paths"
 axis.set_title(title)
 anim_object = PathAnimation(sol, fig, axis)
 anim = anim_object()
-# plt.show()
+plt.show()

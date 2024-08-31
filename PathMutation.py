@@ -95,16 +95,16 @@ class PathMutation(Mutation):
 
     def __init__(self,
                 mutation_info={
-                    "swap_last_point":(0, 1), # 1
-                    "swap": (0.3, 1), # 0.3
-                    "inversion": (0.4, 1), # 0.4
-                    "scramble": (0.3, 1), # 0.3
+                    "swap_last_point":(0, 1),
+                    "swap": (0.3, 1), # 0.15
+                    "inversion": (0.4, 1), # 0.2
+                    "scramble": (0.3, 1), # 0.1
                     "insertion": (0, 1),
                     "displacement": (0, 1),
                     # "reverse sequence": (0.3, 1),
                     "block inversion": (0, 1),
                     # "shift": (0.3, 1),
-                    "sp_mutation": (1,1) # 1
+                    "sp_mutation": (1,1) # 0.15
                 }
     ) -> None:
 
@@ -225,6 +225,7 @@ class PathMutation(Mutation):
                     # print(f"original_start_points: {start_points}, sp: {sp}, prev_sp: {prev_sp}, next_sp: {next_sp}, new_sp_choices: {new_sp_choices}")
                     if len(new_sp_choices) != 0:
                         mut_start_points[sp_ind] = np.random.choice(new_sp_choices)
+                    
 
                     # print(f"original_start_points: {start_points}, sp: {sp}, new_sp_choices: {new_sp_choices}, new_sp: {sp_new}, new_start_points: {mut_start_points}")
             Y[i][0] = PathSolution(mut_path, mut_start_points, problem.info)
