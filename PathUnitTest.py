@@ -11,6 +11,8 @@ from PathResults import save_paths_and_anims_from_scenario, animate_extreme_poin
 # from PathTermination import PathTermination
 from PathAnimation import PathAnimation
 from Time import *
+import os
+import shutil
 
 from PathOptimizationModel import moo_model_with_disconn, distance_soo_model
 from PathInput import *
@@ -27,7 +29,7 @@ class PathUnitTest(object):
 
         self.info = [PathInfo(scenario)] if not isinstance(scenario, list) else list(map(lambda x: PathInfo(x), scenario))
 
-    def __call__(self, save_results=True, animation=True, *args: Any, **kwds: Any) -> Any:
+    def __call__(self, save_results=True, animation=True, copy_to_drive=False, *args: Any, **kwds: Any) -> Any:
 
         for info in self.info:
             print(f"Scenario: {str(info)}")
@@ -39,6 +41,11 @@ class PathUnitTest(object):
                     F.to_pickle(f"{objective_values_filepath}{str(info)}-ObjectiveValues.pkl")
                     save_as_pickle(f"{runtimes_filepath}{str(info)}-Runtime.pkl", R)
                     save_paths_and_anims_from_scenario(str(info))
+                    if copy_to_drive:
+                        source_dir = '/content/Results'
+                        target_dir = '/content/drive/My Drive/SAR/Results'
+                        shutil.copy(source_dir, target_dir)
+
                 if animation:
                     animate_extreme_point_paths(info)
             else:
