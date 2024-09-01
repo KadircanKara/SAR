@@ -44,7 +44,7 @@ class PathUnitTest(object):
                     if copy_to_drive:
                         source_dir = '/content/Results'
                         target_dir = '/content/drive/My Drive/SAR/Results'
-                        shutil.copy(source_dir, target_dir)
+                        shutil.copytree(source_dir, target_dir)
 
                 if animation:
                     animate_extreme_point_paths(info)
