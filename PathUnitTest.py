@@ -32,20 +32,26 @@ class PathUnitTest(object):
         for info in self.info:
             print(f"Scenario: {str(info)}")
             res, F,X,R = self.run_optimization(info)
-            if save_results:
-                save_as_pickle(f"{res_filepath}{str(info)}-Res.pkl", X)
-                save_as_pickle(f"{solutions_filepath}{str(info)}-SolutionObjects.pkl", X)
-                F.to_pickle(f"{objective_values_filepath}{str(info)}-ObjectiveValues.pkl")
-                save_as_pickle(f"{runtimes_filepath}{str(info)}-Runtime.pkl", R)
-                save_paths_and_anims_from_scenario(str(info))
-            if animation:
-                animate_extreme_point_paths(info)
+            if X is not None:
+                if save_results:
+                    save_as_pickle(f"{res_filepath}{str(info)}-Res.pkl", X)
+                    save_as_pickle(f"{solutions_filepath}{str(info)}-SolutionObjects.pkl", X)
+                    F.to_pickle(f"{objective_values_filepath}{str(info)}-ObjectiveValues.pkl")
+                    save_as_pickle(f"{runtimes_filepath}{str(info)}-Runtime.pkl", R)
+                    save_paths_and_anims_from_scenario(str(info))
+                if animation:
+                    animate_extreme_point_paths(info)
+            else:
+                print(f"Scenario: {str(info)} NO SOLUTION FOUND !!!")
 
             
     def run_optimization(self, info):
 
+        res, F, X, R = None, None, None, None,
+
         t = time.time()
         t_start = time.time()
+
         res = minimize(problem=PathProblem(info),
                         algorithm=PathAlgorithm(self.algorithm)(),
                         termination=('n_gen',n_gen),
@@ -54,10 +60,14 @@ class PathUnitTest(object):
                         output=PathOutput(PathProblem(info)),
                         verbose=True,
                         )
+        
         t_end = time.time()
         t_elapsed_seconds = t_end - t_start
-        t_elapsed_minutes = t_elapsed_seconds / 60
-        X = res.X
-        F= pd.DataFrame(abs(res.F), columns=model['F'])
-        R = t_elapsed_seconds
+
+        if res.X is not None:
+            print(res.X)
+            X = res.X
+            F= pd.DataFrame(abs(res.F), columns=model['F'])
+            R = t_elapsed_seconds
+
         return res, F,X,R
