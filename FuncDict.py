@@ -3,7 +3,7 @@ from Connectivity import *
 from Time import *
 from Smoothness import *
 
-from PathSolution import *
+# from PathSolution import *
 
 model_metric_info = {
     # Objective Functions
@@ -20,6 +20,7 @@ model_metric_info = {
     'Path Smoothness as Objective': path_smoothness_as_objective,
     # Inequality Constraints
     'Min Cell Visits': min_cell_visits,
+    'Max Cell Visits': max_cell_visits,
     'Path Speed Violations as Constraint': path_speed_violations_as_constraint,
     'Total Drone Speed Violations as Constraint': total_drone_speed_violations_as_constraint,
     'Max Drone Speed Violations as Constraint': max_drone_speed_violations_as_constraint,
@@ -27,7 +28,7 @@ model_metric_info = {
     'Limit Cell Range': limit_cell_range,
     'Max Mission Time': max_mission_time,
     'Subtour Range':get_subtour_range,
-    'Time Penalties': calculate_time_penalty,
+    # 'Time Penalties': calculate_time_penalty,
     'Longest Subtour': get_longest_subtour,
     'Total Diagonal Steps':get_total_diagonal_steps,
     'Mean Turning Angle': get_mean_turning_angle,

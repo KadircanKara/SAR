@@ -1,5 +1,3 @@
-from posixpath import split
-import matplotlib
 from matplotlib import pyplot as plt
 import os
 from FilePaths import *
@@ -10,11 +8,9 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
 from PathAnimation import PathAnimation
-from PathSolution import PathSolution
+from PathSolution import *
 from Time import get_real_paths
 from Connectivity import calculate_disconnected_timesteps
-from PathInput import *
-from PathInfo import *
 
 
 def list_files(directory):
@@ -26,7 +22,7 @@ def list_files(directory):
     return files
 
 
-def animate_extreme_point_paths(info:PathInfo):
+def animate_extreme_point_paths(info:PathInfo): # type: ignore
 
     scenario = str(info)
     directions = ["Best", "Mid", "Worst"]
@@ -35,8 +31,7 @@ def animate_extreme_point_paths(info:PathInfo):
     # Iterate through each objective
     for obj in objectives:
         fig, axes = plt.subplots(1, 3, figsize=(15, 5))  # Create subplots with 1 row and 3 columns
-        fig.suptitle(f"Obj: {model['Exp']}, Alg: {model['Alg']}, Gen: {info.n_gen}, Pop: {info.pop_size}, n={info.number_of_drones}, r={info.comm_cell_range}, v:{info.min_visits}")
-        # title = f"{direction} {obj.replace('_',' ')} Paths"
+        fig.suptitle(f"Obj: {info.model['Exp']}, Alg: {info.model['Alg']}, Gen: {info.gen_size}, Pop: {info.pop_size}, n={info.number_of_drones}, r={info.comm_cell_range}, v:{info.min_visits}")
         animations = []  # Store all animations to prevent garbage collection
 
         for ax, direction in zip(axes, directions):
@@ -76,52 +71,40 @@ def plot_total_distance_vs_pecentage_connectivity(direction:str, obj:str):
     mean_disconnectivity_values = [np.mean(x) for x in disconnectivity_values]
     max_disconnectivity_values = [np.max(x) for x in disconnectivity_values]
 
-    # print(percentage_connectivity_values)
     plt.subplot(2, 4, 1)
-    # fig = plt.figure()
-    # ax = fig.axes
     plt.title("r=2")
     plt.xlabel("Number of Drones")
     plt.ylabel("Total Distance")
     plt.xticks(number_of_drones_list)
     plt.grid()
-    # plt.ylim((0,1))
     plt.scatter(x=number_of_drones_list, y=total_distance_values, color="blue")
     plt.plot(number_of_drones_list, total_distance_values, color='blue', linestyle='-', label='Line')
 
     plt.subplot(2, 4, 2)
-    # ax = fig.axes
     plt.title("r=2")
     plt.xlabel("Number of Drones")
     plt.ylabel("Percentage Connectivity")
     plt.xticks(number_of_drones_list)
     plt.ylim((0,1.1))
     plt.grid()
-    # plt.ylim((0,1))
     plt.scatter(x=number_of_drones_list, y=percentage_connectivity_values, color='blue')
     plt.plot(number_of_drones_list, percentage_connectivity_values, color='blue', linestyle='-', label='Line')
 
     plt.subplot(2, 4, 3)
-    # ax = fig.axes
     plt.title("r=2")
     plt.xlabel("Number of Drones")
     plt.ylabel("Mean Disconnectivity")
     plt.xticks(number_of_drones_list)
-    # plt.ylim((0,1.1))
     plt.grid()
-    # plt.ylim((0,1))
     plt.scatter(x=number_of_drones_list, y=mean_disconnectivity_values, color='blue')
     plt.plot(number_of_drones_list, mean_disconnectivity_values, color='blue', linestyle='-', label='Line')
 
     plt.subplot(2, 4, 4)
-    # ax = fig.axes
     plt.title("r=2")
     plt.xlabel("Number of Drones")
     plt.ylabel("Max Disconnectivity")
     plt.xticks(number_of_drones_list)
-    # plt.ylim((0,1.1))
     plt.grid()
-    # plt.ylim((0,1))
     plt.scatter(x=number_of_drones_list, y=max_disconnectivity_values, color='blue')
     plt.plot(number_of_drones_list, max_disconnectivity_values, color='blue', linestyle='-', label='Line')
 
@@ -134,50 +117,39 @@ def plot_total_distance_vs_pecentage_connectivity(direction:str, obj:str):
     max_disconnectivity_values = [np.max(x) for x in disconnectivity_values]
 
     plt.subplot(2, 4, 5)
-    # fig = plt.figure()
-    # ax = fig.axes
     plt.title("r=4")
     plt.xlabel("Number of Drones")
     plt.ylabel("Total Distance")
     plt.xticks(number_of_drones_list)
     plt.grid()
-    # plt.ylim((0,1))
     plt.scatter(x=number_of_drones_list, y=total_distance_values, color="blue")
     plt.plot(number_of_drones_list, total_distance_values, color='blue', linestyle='-', label='Line')
 
     plt.subplot(2, 4, 6)
-    # ax = fig.axes
     plt.title("r=4")
     plt.xlabel("Number of Drones")
     plt.ylabel("Percentage Connectivity")
     plt.xticks(number_of_drones_list)
     plt.ylim((0,1.1))
     plt.grid()
-    # plt.ylim((0,1))
     plt.scatter(x=number_of_drones_list, y=percentage_connectivity_values, color='blue')
     plt.plot(number_of_drones_list, percentage_connectivity_values, color='blue', linestyle='-', label='Line')
 
     plt.subplot(2, 4, 7)
-    # ax = fig.axes
     plt.title("r=4")
     plt.xlabel("Number of Drones")
     plt.ylabel("Mean Disconnectivity")
     plt.xticks(number_of_drones_list)
-    # plt.ylim((0,1.1))
     plt.grid()
-    # plt.ylim((0,1))
     plt.scatter(x=number_of_drones_list, y=mean_disconnectivity_values, color='blue')
     plt.plot(number_of_drones_list, mean_disconnectivity_values, color='blue', linestyle='-', label='Line')
 
     plt.subplot(2, 4, 8)
-    # ax = fig.axes
     plt.title("r=4")
     plt.xlabel("Number of Drones")
     plt.ylabel("Max Disconnectivity")
     plt.xticks(number_of_drones_list)
-    # plt.ylim((0,1.1))
     plt.grid()
-    # plt.ylim((0,1))
     plt.scatter(x=number_of_drones_list, y=max_disconnectivity_values, color='blue')
     plt.plot(number_of_drones_list, max_disconnectivity_values, color='blue', linestyle='-', label='Line')
 
@@ -187,34 +159,9 @@ def plot_total_distance_vs_pecentage_connectivity(direction:str, obj:str):
 
 
 
+def save_paths_and_anims_from_scenario(info:PathInfo):
 
-    # print(total_distance_values)
-    # print(percentage_connectivity_values)
-    # for number_of_drones in number_of_drones_list:
-    #     number_of_drones_X = load_pickle([file for file in r_2_X_files if f"n_{number_of_drones}" in file][0])
-    #     plt.scatter(x=number_of_drones_X.total_distance, y=number_of_drones_X.percentage_connectivity)
-
-    # plt.show()
-
-
-    # # Create a new list with parsed strings
-    # F_files_parsed = list(map(lambda x: x.split("_")[1:-1], F_files))
-    # # Find r (comm_cell_range) and minv (min_visits) indices
-    # r_index = F_files_parsed[0].index('r') + 1
-    # minv_index = F_files_parsed[0].index('minv') + 1
-    # # Get r=2, minv=1 files
-    # # print(F_files_parsed[5][r_index])
-    # r_2_F_files = [file for file in F_files if F_files_parsed[F_files.index(file)][r_index] == 2]
-    # # Get r=4, minv=1 files
-    # r_4_F_files = [F_files[i] for i in range(len(F_files)) if F_files_parsed[i][r_index] == 4 and F_files_parsed[i][minv_index] == 1]
-
-
-    # F = load_pickle(f"{objective_values_filepath}{scenario}-ObjectiveValues.pkl")
-    # distance_and_connectivity_values = F[["Total Distance","Percentage Connectivity"]]
-    #
-
-
-def save_paths_and_anims_from_scenario(scenario:str):
+    scenario = str(info)
 
     # f"{objective_values_filepath}{self.scenario}_ObjectiveValues.pkl"
     # f"{solution_objects_filepath}{self.scenario}_SolutionObjects.pkl"
@@ -226,7 +173,7 @@ def save_paths_and_anims_from_scenario(scenario:str):
         objective_name_with_underscore = objective_name.replace(" ", "_")
         objective_values = F[objective_name]
         fig, axes = plt.subplots()
-        if len(model["F"]) == 1: # If model is SOO
+        if len(info.model["F"]) == 1: # If model is SOO
             sol = X[0]
             sol_xpath, sol_ypath = get_real_paths(sol)
             np.savez(f"{paths_filepath}{scenario}-Best-{objective_name_with_underscore}-Paths.npz", arr1=sol_xpath, arr2=sol_ypath)

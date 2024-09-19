@@ -1,7 +1,6 @@
 from pymoo.util.display.column import Column
 from pymoo.util.display.output import Output
 from PathSolution import *
-from PathOptimizationModel import *
 from PathProblem import *
 from pymoo.util.display.single import MinimumConstraintViolation, AverageConstraintViolation
 from pymoo.util.display.multi import NumberOfNondominatedSolutions
@@ -10,7 +9,10 @@ from pymoo.termination.ftol import MultiObjectiveSpaceTermination
 from pymoo.indicators.gd import GD
 from pymoo.indicators.hv import Hypervolume
 from pymoo.indicators.igd import IGD
-from Connectivity import *
+
+import pandas as pd
+# from Connectivity import *
+# from PathOptimizationModel import *
 
 class PathOutput(Output):
 

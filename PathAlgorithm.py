@@ -1,26 +1,15 @@
 from typing import Any
-from PathSampling import *
-from PathMutation import *
-from PathCrossover import *
-from PathRepair import PathRepair
-from pymoo.core.repair import NoRepair
-from PathProblem import *
+# from PathSampling import *
+# from PathMutation import *
+# from PathCrossover import *
+# from PathProblem import *
 
 
-from pymoo.operators.crossover.nox import NoCrossover
-from PathCrossover import PathCrossover
 # from pymoo.operators.crossover. import pmx
-from pymoo.operators.mutation.nom import NoMutation
-from PathMutation import PathMutation
-from pymoo.core.duplicate import NoDuplicateElimination
-from PathDuplicateElimination import PathDuplicateElimination
 
 from pymoo.algorithms.moo.nsga2 import NSGA2
-from pymoo.algorithms.moo.ctaea import CTAEA
 from pymoo.util.ref_dirs import get_reference_directions
-from pymoo.constraints.as_obj import ConstraintsAsObjective
 from pymoo.algorithms.moo.moead import MOEAD
-from pymoo.constraints.eps import AdaptiveEpsilonConstraintHandling
 from pymoo.algorithms.moo.nsga3 import NSGA3
 from pymoo.algorithms.moo.unsga3 import UNSGA3
 # from pymoo.algorithms.moo.age import AGEMOEA
@@ -29,10 +18,10 @@ from pymoo.algorithms.soo.nonconvex.ga import GA
 from pymoo.algorithms.soo.nonconvex.pso import PSO
 
 # from pymoo.termination.default import PathTermination
-from PathOptimizationModel import *
+# from PathOptimizationModel import *
 from PathInput import *
+# from AlgorithmParameters import *
 
-from main import scenario, pop_size, path_eliminate_duplicates, path_sampling, path_mutation, path_crossover, path_repair
 
 # path_eliminate_duplicates = NoDuplicateElimination()
 
@@ -158,7 +147,3 @@ class PathAlgorithm(object):
 
         elif self.algorithm == 'GA':
             return algorithm_dict['GA']
-
-
-# test = PathAlgorithm('NSGA2')()
-# print(test)

@@ -1,6 +1,6 @@
 import numpy as np
 from collections import deque
-from PathSolution import PathSolution
+from PathSolution import *
 # from Time import get_path_matrix
 
 # def longest_path_disconnected_time(sol:PathSolution):

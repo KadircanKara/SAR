@@ -1,6 +1,9 @@
 from PathSolution import *
-from math import atan2, radians, degrees
 from Distance import calculate_path_speed_violations
+
+from math import atan2, radians, degrees, sqrt
+import numpy as np
+
 
 def speed_violation_smoothness_as_constraint(sol:PathSolution):
 

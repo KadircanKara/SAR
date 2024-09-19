@@ -1,32 +1,80 @@
 
 import numpy as np
-from numpy.lib.function_base import average
-from pymoo.core.problem import ElementwiseProblem
-from scipy.spatial import distance
-from typing import List, Dict
 import itertools
-from math import sin, cos, atan2, ceil
-from scipy import io
-# from scipy.stats import itemfreq
-import subprocess
-import time
-import copy
-import matplotlib.pyplot as plt # 1.20.3
-from collections import deque
-import multiprocessing as mp
-from multiprocessing import Pool, cpu_count
+from scipy.spatial.distance import cdist
+from math import floor, ceil
 
-from PathInfo import *
-from PathOptimizationModel import *
-# from PathInput import model
+# from PathInput import model, scenario
 
-# from PathRepair import *
+class PathInfo(object):
 
-# from distance import *
-# from Conumber_of_nodesectivity import *
-# from Time import *
+    def __init__(self, model, pop_size, gen_size, scenario) -> None:
 
-# from PathAnimation import PathAnimation
+        self.scenario = scenario
+
+        self.model = model
+        self.pop_size = pop_size
+        self.gen_size = gen_size
+
+        self.grid_size = self.scenario['grid_size']
+        self.number_of_cells = self.grid_size ** 2
+        self.cell_side_length = self.scenario['cell_side_length']
+        self.number_of_drones = self.scenario['number_of_drones']
+        self.number_of_nodes = self.number_of_drones + 1
+        self.max_drone_speed = self.scenario['max_drone_speed']
+        self.comm_cell_range = self.scenario['comm_cell_range']
+        self.comm_dist = self.comm_cell_range * self.cell_side_length
+        self.min_visits = self.scenario['min_visits']
+        self.max_visits = self.scenario['max_visits']
+        self.number_of_targets = self.scenario['number_of_targets']
+        self.target_positions = self.scenario['target_positions']
+        self.true_detection_probability = self.scenario['true_detection_probability']
+        self.false_detection_probability = self.scenario['false_detection_probability']
+        self.detection_threshold = self.scenario['detection_threshold']
+        self.max_isolated_time = self.scenario['max_isolated_time']
+
+
+        # self.grid_size = scenario_dict['grid_size'] if scenario_dict else scenario['grid_size']
+        # self.number_of_cells = self.grid_size ** 2
+        # self.cell_side_length = scenario_dict['cell_side_length'] if scenario_dict else scenario['cell_side_length']
+        # self.number_of_drones = scenario_dict['number_of_drones'] if scenario_dict else scenario['number_of_drones']
+        # self.number_of_nodes = self.number_of_drones + 1
+        # self.max_drone_speed = scenario_dict['max_drone_speed'] if scenario_dict else scenario['max_drone_speed']
+        # self.comm_cell_range = scenario_dict['comm_cell_range'] if scenario_dict else scenario['comm_cell_range']
+        # self.comm_dist = self.comm_cell_range * self.cell_side_length
+        # self.min_visits = scenario_dict['min_visits'] if scenario_dict else scenario['min_visits']
+        # self.max_visits = scenario_dict['max_visits'] if scenario_dict else scenario['max_visits']
+        # self.number_of_targets = scenario_dict['number_of_targets'] if scenario_dict else scenario['number_of_targets']
+        # self.target_positions = scenario_dict['target_positions'] if scenario_dict else scenario['target_positions']
+        # self.true_detection_probability = scenario_dict['true_detection_probability'] if scenario_dict else scenario['true_detection_probability']
+        # self.false_detection_probability = scenario_dict['false_detection_probability'] if scenario_dict else scenario['false_detection_probability']
+        # self.detection_threshold = scenario_dict['detection_threshold'] if scenario_dict else scenario['detection_threshold']
+        # self.max_isolated_time = scenario_dict['max_isolated_time'] if scenario_dict else scenario['max_isolated_time']
+
+        P = [[i, j] for i in range(self.grid_size) for j in range(self.grid_size)]
+        P.append([-1, -1])
+        self.D = cdist(P, P) * self.cell_side_length
+
+        self.min_subtour_length_threshold = (self.number_of_cells * self.min_visits / self.number_of_drones)*self.cell_side_length
+        self.max_subtour_length_threshold = (self.number_of_cells * self.min_visits / self.number_of_drones)*self.cell_side_length # self.min_subtour_length_threshold + 20
+
+    def __str__(self) -> str:
+
+
+        multi_line_scenario = f'''{self.model['Type']}_{self.model['Alg']}_{self.model['Exp']}_g_{self.grid_size}_a_{self.cell_side_length}_n_{self.number_of_drones}_
+v_{self.max_drone_speed}_r_{self.comm_cell_range}_minv_{self.min_visits}_
+maxv_{self.max_visits}_Nt_{self.number_of_targets}_tarPos_{self.target_positions}_
+ptdet_{self.true_detection_probability}_pfdet_{self.false_detection_probability}_
+detTh_{self.detection_threshold}_maxIso_{self.max_isolated_time}
+'''
+
+
+        lines = multi_line_scenario.splitlines()
+
+        single_line_scenario = ''.join(lines)
+
+        return single_line_scenario
+
 
 def sign(x):
     return 1 if x > 0 else -1 if x < 0 else 0  # Returns 0 if x is exactly 0
@@ -37,7 +85,6 @@ def split_list(lst, val):
             itertools.groupby(lst, lambda x: x == val) if not k]
 
 
-# if __name__ == '__main__' :
 
 class PathSolution():
 
@@ -91,10 +138,8 @@ class PathSolution():
             self.get_pathplan() # Calculates drone dict and path matrix (not interpolated, directly from the path sequenumber_of_cellse and start points)
         
         if calculate_connectivity:
-            if model != distance_soo_model:
                 self.do_connectivity_calculations()
         if calculate_disconnectivity:
-            if model == moo_model_with_disconn:
                 self.do_disconnectivity_calculations()
 
 
@@ -174,71 +219,43 @@ class PathSolution():
 
         # APPLY HOVERING TO DRONES WITH SHORTER PATHS (ONLY IF MOO)
 
-        if info.model != distance_soo_model:
+        # if info.model != distance_soo_model:
 
-            # drone_dict = {k:v for k,v in self.drone_dict.items() if k!=-1}
-            # print(f"Dict Values Object: {list(drone_dict.items())}")
-            path_lens = [len(path) for path in list(self.drone_dict.values())]
-            # hovering_drone_ids = [path_lens.index(i) for i in path_lens if i != max(path_lens)]
-            # hovering_drone_ids = [i for i in range(info.number_of_drones) if i != path_lens.index(max(path_lens))]
-            # Get Hovering Drones
-            hovering_drone_ids = []
-            shift = 0
-            path_lens_temp = path_lens.copy()
-            while len(path_lens_temp) > 0:
-                if path_lens_temp[0] != max(path_lens):
-                    hovering_drone_ids.append(shift)
-                shift += 1
-                path_lens_temp.pop(0)
-            self.hovering_drones = hovering_drone_ids
-            # print(f"Path Lens: {path_lens}")
-            # print(f"Hovering Drone IDs: {hovering_drone_ids}")
-            for drone in hovering_drone_ids:
-                # print("----------------------------------------------------------")
-                # print(f"Drone {drone}:")
-                # print("----------------------------------------------------------")
-                # APPLY HOVERING
-                path_without_hovering = self.real_time_path_matrix[drone+1].copy()
-                # Find last cell
-                hovering_cell_idx = np.where(path_without_hovering==-1)[0][1] - 1
-                hovering_cell = path_without_hovering[hovering_cell_idx]
-                # print(f"Hovering Cell Idx: {hovering_cell_idx}, Hovering Cell: {hovering_cell}")
-                hovering_component = np.array([hovering_cell] * (len(path_without_hovering) - hovering_cell_idx - 1))
-                # print(f"Hovering Component: {hovering_component}")
-                path_with_hovering = path_without_hovering.copy()
-                # path_with_hovering = np.insert(path_with_hovering, )
-                path_with_hovering[hovering_cell_idx:len(path_without_hovering)-1] = hovering_component
-                self.real_time_path_matrix[drone+1] = path_with_hovering
-            # INTERPOLATE PATH BACK TO BS AFTER HOVERING
-            # print("Iniitial Path Matrix:\n", self.real_time_path_matrix)
-            drone_interpolated_last_step_list = []
-            for drone in range(info.number_of_drones):
-                drone_interpolated_last_step = interpolate_between_cities(self, self.real_time_path_matrix[drone+1][-2], 0)
-                if self.real_time_path_matrix[drone+1][-2] != 0:
-                    drone_interpolated_last_step = drone_interpolated_last_step[1:]
-                # print("-->", drone_interpolated_last_step)
-                drone_interpolated_last_step_list.append(drone_interpolated_last_step)
-            max_interpolated_last_step_len = max([len(x) for x in drone_interpolated_last_step_list])
+        path_lens = [len(path) for path in list(self.drone_dict.values())]
+        # Get Hovering Drones
+        hovering_drone_ids = []
+        shift = 0
+        path_lens_temp = path_lens.copy()
+        while len(path_lens_temp) > 0:
+            if path_lens_temp[0] != max(path_lens):
+                hovering_drone_ids.append(shift)
+            shift += 1
+            path_lens_temp.pop(0)
+        self.hovering_drones = hovering_drone_ids
+        for drone in hovering_drone_ids:
+            # APPLY HOVERING
+            path_without_hovering = self.real_time_path_matrix[drone+1].copy()
+            # Find last cell
+            hovering_cell_idx = np.where(path_without_hovering==-1)[0][1] - 1
+            hovering_cell = path_without_hovering[hovering_cell_idx]
+            hovering_component = np.array([hovering_cell] * (len(path_without_hovering) - hovering_cell_idx - 1))
+            path_with_hovering = path_without_hovering.copy()
+            path_with_hovering[hovering_cell_idx:len(path_without_hovering)-1] = hovering_component
+            self.real_time_path_matrix[drone+1] = path_with_hovering
+        drone_interpolated_last_step_list = []
+        for drone in range(info.number_of_drones):
+            drone_interpolated_last_step = interpolate_between_cities(self, self.real_time_path_matrix[drone+1][-2], 0)
+            if self.real_time_path_matrix[drone+1][-2] != 0:
+                drone_interpolated_last_step = drone_interpolated_last_step[1:]
+            drone_interpolated_last_step_list.append(drone_interpolated_last_step)
+        max_interpolated_last_step_len = max([len(x) for x in drone_interpolated_last_step_list])
 
-            # print(drone_interpolated_last_step_list)
+        for drone in range(info.number_of_drones):
+            if len(drone_interpolated_last_step_list[drone]) < max_interpolated_last_step_len:
+                drone_interpolated_last_step_list[drone].extend([drone_interpolated_last_step_list[drone][-1]] * (max_interpolated_last_step_len - len(drone_interpolated_last_step_list[drone])))
+        drone_interpolated_path_array = np.insert(np.array(drone_interpolated_last_step_list), 0, np.full((1,max_interpolated_last_step_len), -1, dtype=int), axis=0)
+        self.real_time_path_matrix = np.hstack((self.real_time_path_matrix[:,:-1], drone_interpolated_path_array, np.full((info.number_of_nodes,1), -1, dtype=int)))
 
-            for drone in range(info.number_of_drones):
-                if len(drone_interpolated_last_step_list[drone]) < max_interpolated_last_step_len:
-                    # print("Old Last Step:", drone_interpolated_last_step_list[drone])
-                    drone_interpolated_last_step_list[drone].extend([drone_interpolated_last_step_list[drone][-1]] * (max_interpolated_last_step_len - len(drone_interpolated_last_step_list[drone])))
-                    # print("New Last Step:", drone_interpolated_last_step_list[drone])
-                    # print(drone_interpolated_last_step_list[i])
-                # self.real_time_path_matrix[drone+1] = np.insert(self.real_time_path_matrix, -1, drone_interpolated_last_step_list[i])
-            # print("Final Last Steps:", drone_interpolated_last_step_list)
-            drone_interpolated_path_array = np.insert(np.array(drone_interpolated_last_step_list), 0, np.full((1,max_interpolated_last_step_len), -1, dtype=int), axis=0)
-            # print(drone_interpolated_path_array)
-            # print(np.array(drone_interpolated_last_step_list))
-            # print(np.array(drone_interpolated_last_step_list).shape, self.real_time_path_matrix.shape)
-            # print(self.real_time_path_matrix.shape, drone_interpolated_path_array.shape)
-            self.real_time_path_matrix = np.hstack((self.real_time_path_matrix[:,:-1], drone_interpolated_path_array, np.full((info.number_of_nodes,1), -1, dtype=int)))
-            # self.real_time_path_matrix = np.insert(self.real_time_path_matrix, -1, drone_interpolated_path_array, axis=1)
-
-        # print("Final Path Matrix:\n", self.real_time_path_matrix)
 
 
         self.time_slots = self.real_time_path_matrix.shape[1]
