@@ -1,15 +1,15 @@
-from PathSolution import *
+from PathInfo import *
 
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from PathSolution import PathSolution
 from FileManagement import load_pickle
-from PathInput import *
+from PathInput import test_setup_scenario
 from PathAnimation import PathAnimation
 
 
 # Initialize the PathInfo object
-info = PathInfo(scenario=scenario, pop_size=pop_size, gen_size=gen_size, model=model)
+info = PathInfo(test_setup_scenario)
 
 scenario = str(info)
 directions = ["Best", "Mid", "Worst"]
@@ -18,7 +18,7 @@ objectives = [x.replace(" ", "_") for x in info.model["F"]]
 # Iterate through each objective
 for obj in objectives:
     fig, axes = plt.subplots(1, 3, figsize=(15, 5))  # Create subplots with 1 row and 3 columns
-    fig.suptitle(f"Obj: {info.model['Exp']}, Alg: {info.model['Alg']}, n={info.number_of_drones}, r={info.comm_cell_range}, v:{info.min_visits}")
+    fig.suptitle(f"Obj: {model['Exp']}, Alg: {model['Alg']}, n={info.number_of_drones}, r={info.comm_cell_range}, v:{info.min_visits}")
     # title = f"{direction} {obj.replace('_',' ')} Paths"
     animations = []  # Store all animations to prevent garbage collection
 

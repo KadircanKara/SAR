@@ -1,20 +1,26 @@
+from statistics import median, median_low, median_high
 from typing import Any
-import time
-
+import pickle
 from PathAlgorithm import *
 from PathOutput import *
+from pymoo.operators.crossover.nox import NoCrossover
+from pymoo.operators.mutation.nom import NoMutation
+from pymoo.core.duplicate import NoDuplicateElimination
 from pymoo.optimize import minimize
 from PathResults import save_paths_and_anims_from_scenario, animate_extreme_point_paths
 # from PathTermination import PathTermination
-# from Time import *
+from PathAnimation import PathAnimation
+from Time import *
 import os
 import shutil
 # from google.colab import drive
 # drive.mount('/content/drive')
 
+from PathOptimizationModel import moo_model_with_disconn, distance_soo_model
 from PathInput import *
+# from main import *
 from FilePaths import *
-from FileManagement import save_as_pickle
+from FileManagement import save_as_pickle, load_pickle
 
 
 class PathUnitTest(object):
@@ -24,7 +30,7 @@ class PathUnitTest(object):
         self.model = model
         self.algorithm = self.model["Alg"] # From PathInput
 
-        self.info = [PathInfo(scenario=scenario, pop_size=pop_size, gen_size=gen_size, model=model)] if not isinstance(scenario, list) else list(map(lambda x: PathInfo(scenario=x, pop_size=pop_size, gen_size=gen_size, model=model), scenario))
+        self.info = [PathInfo(scenario)] if not isinstance(scenario, list) else list(map(lambda x: PathInfo(x), scenario))
 
     def __call__(self, save_results=True, animation=True, copy_to_drive=False, *args: Any, **kwds: Any) -> Any:
 
@@ -37,7 +43,7 @@ class PathUnitTest(object):
                     save_as_pickle(f"{solutions_filepath}{str(info)}-SolutionObjects.pkl", X)
                     F.to_pickle(f"{objective_values_filepath}{str(info)}-ObjectiveValues.pkl")
                     save_as_pickle(f"{runtimes_filepath}{str(info)}-Runtime.pkl", R)
-                    save_paths_and_anims_from_scenario(info)
+                    save_paths_and_anims_from_scenario(str(info))
                     if copy_to_drive:
                         source_dir = '/content/Results'
                         target_dir = '/content/drive/My Drive/SAR/Results'
@@ -58,7 +64,7 @@ class PathUnitTest(object):
 
         res = minimize(problem=PathProblem(info),
                         algorithm=PathAlgorithm(self.algorithm)(),
-                        termination=('n_gen',gen_size),
+                        termination=('n_gen',n_gen),
                         save_history=True,
                         seed=1,
                         output=PathOutput(PathProblem(info)),
@@ -75,17 +81,3 @@ class PathUnitTest(object):
             R = t_elapsed_seconds
 
         return res, F,X,R
-    
-if __name__ == "__main__":
-
-    dir = os.listdir("Results/Objectives")
-    minv_2_files = np.array([x for x in dir if ("minv_2" in x) and ("time_conn_disconn" in x)])
-    # print(minv_2_files)
-
-    print(f"sp mut prob: {path_mutation.mutation_info['sp_mutation']}, crossover prob: {path_crossover.prob}, ox prob: {path_crossover.ox_prob}" )
-
-    # run_n_visit_scenarios(2)
-    test = PathUnitTest(scenario)
-    test(save_results=True, animation=False, copy_to_drive=False)
-
-    os.system('afplay /System/Library/Sounds/Glass.aiff')

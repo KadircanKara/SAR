@@ -1,11 +1,15 @@
 # Comprehensive Sequential Constructive Crossover (CSCX)
+from typing import Dict
 import numpy as np
 import random
+from time import sleep
+import os
 from scipy.signal import convolve
 
 from PathSolution import *
 
 from pymoo.core.crossover import Crossover
+from pymoo.core.variable import Real, get
 
 
 

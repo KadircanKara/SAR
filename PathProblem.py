@@ -1,8 +1,13 @@
 import autograd.numpy as anp
 import types
 
+from PathOptimizationModel import *
 from PathSolution import *
+from PathInfo import *
+from Distance import *
+from Connectivity import *
 from FuncDict import *
+from PathRepair import *
 
 from pymoo.core.problem import ElementwiseProblem
 

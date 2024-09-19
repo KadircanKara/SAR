@@ -61,7 +61,7 @@ class PathSampling(Sampling):
             # print(f"Path: {path}")
             # print("Start Points: ", start_points)
 
-            X[i, :] = PathSolution(path, start_points, problem.info, calculate_pathplan=True, calculate_connectivity=True, calculate_disconnectivity=True)
+            X[i, :] = PathSolution(path, start_points, problem.info, calculate_pathplan=False, calculate_connectivity=False, calculate_disconnectivity=False)
 
         return X
 

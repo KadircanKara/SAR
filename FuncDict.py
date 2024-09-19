@@ -3,7 +3,7 @@ from Connectivity import *
 from Time import *
 from Smoothness import *
 
-# from PathSolution import *
+from PathSolution import *
 
 model_metric_info = {
     # Objective Functions
@@ -28,7 +28,7 @@ model_metric_info = {
     'Limit Cell Range': limit_cell_range,
     'Max Mission Time': max_mission_time,
     'Subtour Range':get_subtour_range,
-    # 'Time Penalties': calculate_time_penalty,
+    'Time Penalties': calculate_time_penalty,
     'Longest Subtour': get_longest_subtour,
     'Total Diagonal Steps':get_total_diagonal_steps,
     'Mean Turning Angle': get_mean_turning_angle,

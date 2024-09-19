@@ -1,10 +1,9 @@
+# from Connectivity import *
 from PathSolution import *
 from Distance import *
-
 from scipy.io import savemat
 from statistics import median_low
 from copy import deepcopy
-from math import ceil
 
 def calculate_max_visits(sol:PathSolution):
     info = sol.info
