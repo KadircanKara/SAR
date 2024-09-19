@@ -47,6 +47,8 @@ class PathRepair(Repair):
 
             # print(f"New Path Length: {len(new_path)}")
 
+            # print(f"Frequency:\n{pd.Series(new_path).value_counts()}")
+
             #X[k, 0] = PathSolution(new_path, np.copy(sol.start_points), problem.info, calculate_conn=True, calculate_dist=True)
 
         return X
@@ -84,24 +86,36 @@ class PathRepair(Repair):
 
         copy_path.pop(0)
 
-        while(True):
+        # print(f"min visits: {sol.info.min_visits}")
+
+        while(len(new_path) < sol.info.number_of_cells * sol.info.min_visits):
+
             # print(copy_path)
             city = copy_path[0]
+
             copy_path.pop(0)
 
-            if city not in new_path:
+            # if city not in new_path:
+            # print(f"new path: {new_path}, city: {city}, count: {new_path.count(city)}")
+            # print("-->", new_path.count(city))
+            if new_path.count(city) < sol.info.min_visits:
                 # Interpolate cities
                 mid_cities = self.interpolate_between_cities(sol, city_prev, city)
                 for city_mid in mid_cities:
-                    if city_mid not in new_path:
+                    # if city_mid not in new_path:
+                    if new_path.count(city_mid) < sol.info.min_visits:
                         new_path.append(city_mid)
 
             # print(f"city prev: {city_prev}, city: {city}, new path: {new_path}")
+            # print(f"New Path Length: {len(new_path)}")
 
             city_prev = city
 
-            if len(new_path) == sol.info.number_of_cells * sol.info.min_visits:
-                break
+            # if len(new_path) == sol.info.number_of_cells * sol.info.min_visits:
+            # if len(copy_path) == 1:
+                # break
+
+            # print(len(new_path))
 
         return new_path
 

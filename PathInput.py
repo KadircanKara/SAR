@@ -14,7 +14,7 @@ from pymoo.core.duplicate import NoDuplicateElimination
 model = moo_model_with_disconn
 
 # ALG
-pop_size = 100
+pop_size = 200
 n_gen = 3000
 
 # OPERATORS
@@ -38,7 +38,7 @@ n_gen = 3000
 test_setup_scenario = {
 'grid_size': 8,
 'cell_side_length': 50,
-'number_of_drones': 20,
+'number_of_drones': 8,
 'max_drone_speed': 2.5, # m/s
 'comm_cell_range': 2,  # 2 cells
 'min_visits': 1,  # Minimum number of cell visits

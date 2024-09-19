@@ -74,6 +74,8 @@ class PathSolution():
         self.shortest_subtour = None
         self.subtour_range = None
         self.drone_speed_violations = None
+        self.path_speed_violations = None
+        self.speed_violations = None
 
         # Connectivity
         self.connectivity_matrix = None
@@ -158,17 +160,17 @@ class PathSolution():
         Nd, time_steps = self.real_time_path_matrix.shape
         Nd -= 1 # Remove base station
 
-        self.subtour_lengths = dict()
+        self.subtour_lengths = []
 
         for i in range(info.number_of_drones):
             drone_path = self.real_time_path_matrix[i+1]
             drone_dist = 0
             for j in range(time_steps-1):
                 drone_dist += info.D[drone_path[j],drone_path[j+1]]
-            self.subtour_lengths[i] = drone_dist
+            self.subtour_lengths.append(drone_dist)
 
-        self.total_distance = sum(self.subtour_lengths.values())
-        self.longest_subtour = max(self.subtour_lengths.values())
+        self.total_distance = sum(self.subtour_lengths)
+        self.longest_subtour = max(self.subtour_lengths)
 
         # APPLY HOVERING TO DRONES WITH SHORTER PATHS (ONLY IF MOO)
 

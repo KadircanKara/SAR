@@ -79,9 +79,12 @@ def enforce_hovering_connectivity(sol:PathSolution):
 
     # Step 1: Identify hovering drones
 
-    hovering_drones = [i for i in range(info.number_of_drones) if len(sol.drone_dict[i]) < sol.time_slots]
-
+    hovering_drones = [i for i in range(info.number_of_drones) if sol.subtour_lengths[i] < max(sol.subtour_lengths)]
+    
     hovering_cells = [sol.drone_dict[i][-2] for i in hovering_drones]
+    # print(f"drone dict:\n{sol.drone_dict}\nHovering Cells: {hovering_cells}")
+
+    # hovering_cells = [x for x in sol.path if sol.path.index(x)]
 
     hovering_cells.insert(0,-1) # Add BS' position to "hovering cells"
 

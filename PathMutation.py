@@ -96,15 +96,18 @@ class PathMutation(Mutation):
     def __init__(self,
                 mutation_info={
                     "swap_last_point":(0, 1),
-                    "swap": (0.3, 1), # 0.15
-                    "inversion": (0.4, 1), # 0.2
-                    "scramble": (0.3, 1), # 0.1
+                    "swap": (0.3, 1), # 0.3 0.5
+                    "inversion": (0.4, 1), # 0.4
+                    "scramble": (0.3, 1), # 0.3 0.6
                     "insertion": (0, 1),
                     "displacement": (0, 1),
                     # "reverse sequence": (0.3, 1),
                     "block inversion": (0, 1),
                     # "shift": (0.3, 1),
-                    "sp_mutation": (1,1) # 0.15
+                    "sp_mutation": (0.95, 1), # 1.0 for 4 drones |  0.95 for 8 drones | 0.7 for 12 drones | 0.5 for 16 drones
+                    "longest_path_swap": (0.3,1),
+                    "longest_path_inversion": (0.4,1),
+                    "longest_path_scramble": (0.3,1),
                 }
     ) -> None:
 
@@ -113,6 +116,8 @@ class PathMutation(Mutation):
         self.mutation_info = mutation_info
 
     def _do(self, problem : PathProblem, X, **kwargs):
+
+        # print("Mutation")
 
         Y = X.copy()
 
@@ -127,7 +132,10 @@ class PathMutation(Mutation):
 
             # print("Original Start Points:",start_points)
             #
+
+
             # PATH MUTATIONS
+
             if np.random.random() <= self.mutation_info["swap_last_point"][0] and "Percentage Connectivity" in sol.info.model["F"]:
                     # hovering_cells = [sol.drone_dict[i][-2] for i in range(sol.info.number_of_drones)]
                     hovering_cells = [mut_path[mut_start_points[x]-1] for x in range(1,len(mut_start_points))]
@@ -207,7 +215,6 @@ class PathMutation(Mutation):
                     mut_path = np.insert(mut_path, new_position, seq)
 
 
-
             # START POINTS MUTATIONS
 
             if np.random.random() <= self.mutation_info["sp_mutation"][0]:
@@ -228,6 +235,9 @@ class PathMutation(Mutation):
                     
 
                     # print(f"original_start_points: {start_points}, sp: {sp}, new_sp_choices: {new_sp_choices}, new_sp: {sp_new}, new_start_points: {mut_start_points}")
+
+            
             Y[i][0] = PathSolution(mut_path, mut_start_points, problem.info)
+
 
         return Y

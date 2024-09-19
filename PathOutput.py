@@ -26,6 +26,8 @@ class PathOutput(Output):
 
         self.best_dist = None
         self.best_time = None
+        self.time_at_best_conn = None
+        self.conn_at_best_time = None
         self.best_subtour = None
         self.best_conn = None
         self.best_mean_disconn = None
@@ -66,51 +68,31 @@ class PathOutput(Output):
             self.best_time = Column("best_time", width=width)
             self.columns += [self.best_time]
 
+        if "Percentage Connectivity" in objs:
+            self.best_conn = Column("best_conn", width=width)
+            self.columns += [self.best_conn]
+
+        if "Mission Time" in objs and "Percentage Connectivity" in objs:
+            self.time_at_best_conn = Column("time_at_best_conn", width=21)
+            self.conn_at_best_time = Column("conn_at_best_time", width=21)
+            self.columns += [self.time_at_best_conn]
+            self.columns += [self.conn_at_best_time]
+
         if "Longest Subtour" in objs:
             self.best_subtour = Column("best_subtour", width=width)
             self.columns += [self.best_subtour]
-        #
-        if "Percentage Connectivity" in objs:
-            # print("Connectivity Output In !")
-            self.best_conn = Column("best_conn", width=width)
-            # self.min_perc_conn = Column("min_perc_conn", width=13)
-            # self.max_perc_conn = Column("max_perc_conn", width=13)
-            # self.mean_perc_conn = Column("mean_perc_conn", width=15)
-            # self.min_perc_conn = Column("min_perc_conn", width=len("min_perc_conn"))
-            # self.max_perc_conn = Column("max_perc_conn", width=len("max_perc_conn"))
-            # self.mean_perc_conn = Column("mean_perc_conn", width=len("mean_perc_conn"))
-            self.columns += [self.best_conn]
-        #
+
         if "Max Disconnected Time" in objs:
             self.best_max_disconn = Column("best_max_disconn", width=16)
-            # self.min_maxDisconnectedTime = Column("min_maxDisconnTime", width=17)
-            # self.max_maxDisconnectedTime = Column("max_maxDisconnTime", width=17)
-            # self.mean_maxDisconnectedTime = Column("mean_maxDisconnTime", width=17)
-            # self.min_disconnected_time = Column("min_disconn_time", width=len("min_disconn_time"))
-            # self.max_disconnected_time = Column("max_disconn_time", width=len("max_disconn_time"))
-            # self.mean_disconnected_time = Column("mean_disconn_time", width=len("mean_disconn_time"))
             self.columns += [self.best_max_disconn]
-        #
+
         if "Mean Disconnected Time" in objs:
             self.best_mean_disconn = Column("best_mean_disconn", width=17)
-            # self.min_meanDisconnectedTime = Column("min_meanDisconnTime", width=17)
-            # self.max_meanDisconnectedTime = Column("max_meanDisconnTime", width=17)
-            # self.mean_meanDisconnectedTime = Column("mean_meanDisconnTime", width=17)
-            # self.min_disconnected_time = Column("min_disconn_time", width=len("min_disconn_time"))
-            # self.max_disconnected_time = Column("max_disconn_time", width=len("max_disconn_time"))
-            # self.mean_disconnected_time = Column("mean_disconn_time", width=len("mean_disconn_time"))
             self.columns += [self.best_mean_disconn]
 
         if "Percentage Disconnectivity" in objs:
             self.best_disconn = Column("best_disconn", width=17)
-            # self.min_meanDisconnectedTime = Column("min_meanDisconnTime", width=17)
-            # self.max_meanDisconnectedTime = Column("max_meanDisconnTime", width=17)
-            # self.mean_meanDisconnectedTime = Column("mean_meanDisconnTime", width=17)
-            # self.min_disconnected_time = Column("min_disconn_time", width=len("min_disconn_time"))
-            # self.max_disconnected_time = Column("max_disconn_time", width=len("max_disconn_time"))
-            # self.mean_disconnected_time = Column("mean_disconn_time", width=len("mean_disconn_time"))
             self.columns += [self.best_disconn]
-
 
 
         # FROM MULTI
@@ -147,6 +129,16 @@ class PathOutput(Output):
         if self.best_time:
             time_values = [sol[0].mission_time for sol in sols]
             self.best_time.set(min(time_values))
+
+        if self.time_at_best_conn:
+            conn_values = [sol[0].percentage_connectivity for sol in sols]
+            best_conn_idx = conn_values.index(max(conn_values))
+            self.time_at_best_conn.set(sols[best_conn_idx][0].mission_time)
+
+        if self.conn_at_best_time:
+            time_values = [sol[0].mission_time for sol in sols]
+            best_time_idx = time_values.index(min(time_values))
+            self.conn_at_best_time.set(sols[best_time_idx][0].percentage_connectivity)
 
         if self.best_conn:
             conn_values = [sol[0].percentage_connectivity for sol in sols]

@@ -13,9 +13,12 @@ from PathAnimation import PathAnimation
 from Time import *
 import os
 import shutil
+# from google.colab import drive
+# drive.mount('/content/drive')
 
 from PathOptimizationModel import moo_model_with_disconn, distance_soo_model
 from PathInput import *
+# from main import *
 from FilePaths import *
 from FileManagement import save_as_pickle, load_pickle
 
@@ -44,7 +47,7 @@ class PathUnitTest(object):
                     if copy_to_drive:
                         source_dir = '/content/Results'
                         target_dir = '/content/drive/My Drive/SAR/Results'
-                        shutil.copytree(source_dir, target_dir)
+                        shutil.copy(source_dir, target_dir)
 
                 if animation:
                     animate_extreme_point_paths(info)

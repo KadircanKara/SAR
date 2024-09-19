@@ -1,5 +1,31 @@
 from PathSolution import *
 from math import atan2, radians, degrees
+from Distance import calculate_path_speed_violations
+
+def speed_violation_smoothness_as_constraint(sol:PathSolution):
+
+    penalty = 0
+    angles = [0.0, 45.0, 90.0, 135.0, 180.0, -135.0, -90.0, -45.0]
+
+    if not sol.path_speed_violations:
+        calculate_path_speed_violations(sol)
+
+    path = [x % sol.info.number_of_cells for x in sol.path]
+    
+    if sol.path_speed_violations > 0:
+        for i in range(len(sol.path)-1):
+            prev_cell, next_cell = path[i], path[i+1]
+            is_speed_violation = bool(sol.info.D[prev_cell, next_cell] > sol.info.cell_side_length * sqrt(2))
+            if is_speed_violation:
+                prev_coords = sol.get_coords(prev_cell)
+                next_coords = sol.get_coords(next_cell)
+                x, y = next_coords - prev_coords
+                theta = degrees(atan2(y, x))
+                print(f"Prev Cell: {prev_cell}, Next Cell: {next_cell}, Theta: {theta}")
+                if theta not in angles:
+                    penalty += 1
+    
+    return penalty
 
 def calculate_path_smoothness_penalties(sol:PathSolution) -> dict:
     drone_path_smoothness_penalties = dict() # Dİct that involves all the penalties
