@@ -8,6 +8,7 @@ from typing import List, Dict
 import random
 from math import floor
 import pandas as pd
+import sympy as sp
 
 from PathInput import *
 
@@ -66,10 +67,19 @@ class PathInfo(object):
 
     def __str__(self) -> str:
 
-        # print(self.model)
+        # if int(self.comm_cell_range / sqrt(2)) == self.comm_cell_range / sqrt(2): # Means it involves sqrt(2)
+        #     comm_cell_range = sp.sqrt(int(self.comm_cell_range / sqrt(2))**2 * 2)
+        # else:
+        #     comm_cell_range = self.comm_cell_range
+
+        # print(f"comm cell range squared: {self.comm_cell_range**2}, sym: {sp.sqrt(int(self.comm_cell_range**2))}")
+        if self.comm_cell_range == 2*sqrt(2):
+            comm_cell_range = sp.sqrt(round(self.comm_cell_range**2))
+        else:
+            comm_cell_range = self.comm_cell_range
 
         multi_line_scenario = f'''{self.model['Type']}_{self.model['Alg']}_{self.model['Exp']}_g_{self.grid_size}_a_{self.cell_side_length}_n_{self.number_of_drones}_
-v_{self.max_drone_speed}_r_{self.comm_cell_range}_minv_{self.min_visits}_
+v_{self.max_drone_speed}_r_{comm_cell_range}_minv_{self.min_visits}_
 maxv_{self.max_visits}_Nt_{self.number_of_targets}_tarPos_{self.target_positions}_
 ptdet_{self.true_detection_probability}_pfdet_{self.false_detection_probability}_
 detTh_{self.detection_threshold}_maxIso_{self.max_isolated_time}

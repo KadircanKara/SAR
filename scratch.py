@@ -16,8 +16,8 @@ from PathAlgorithm import *
 info = PathInfo(scenario)
 model = info.model
 scenario = str(info)
-F = load_pickle(f"Results/Objectives/{scenario}-ObjectiveValues.pkl").sort_values("Mission Time")
-print(F.to_string(index=False))
+# F = load_pickle(f"Results/Objectives/{scenario}-ObjectiveValues.pkl").sort_values("Mission Time")
+# print(F.to_string(index=False))
 direction = "Best"
 obj = "Mission_Time"
 sol = load_pickle(f"Results/Solutions/{scenario}-{direction}-{obj}-Solution.pkl")

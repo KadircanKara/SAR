@@ -16,6 +16,7 @@ from PathProblem import *
 from Distance import *
 from PathAnimation import *
 
+
 # from functools import lru_cache
 # from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -26,6 +27,9 @@ class PathRepair(Repair):
 
     def _do(self, problem, X, **kwargs):
 
+        calculate_connectivity = "Percentage Connectivity" in problem.model["F"]
+        calculate_disconnectivity = "Mean Disconnected Time" in problem.model["F"] or "Max Disconnected Time" in problem.model["F"]
+        # print(calculate_connectivity,calculate_disconnectivity)
         # print("Repair Handling")
         
         for k in range(len(X)):
@@ -43,7 +47,7 @@ class PathRepair(Repair):
 
             # print(f"new path: {new_path}")
 
-            X[k, 0] = PathSolution(new_path, np.copy(sol.start_points), sol.info, calculate_pathplan=True, calculate_connectivity=True, calculate_disconnectivity=True)
+            X[k, 0] = PathSolution(new_path, np.copy(sol.start_points), sol.info, calculate_pathplan=True, calculate_connectivity=calculate_connectivity, calculate_disconnectivity=calculate_disconnectivity)
 
             # print(f"New Path Length: {len(new_path)}")
 
