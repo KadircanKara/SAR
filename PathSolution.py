@@ -47,7 +47,7 @@ class PathSolution():
             f"Objective Values: totaldistance_{self.total_distance}_longestSubtour_{self.longest_subtour}_percentageConumber_of_nodesectivity_{self.percentage_connectivity}\n" \
             f"Chromosome: pathSequenumber_of_cellse_{self.path}_startPoints_{self.start_points}"
 
-    def __init__(self, path, start_points,  info:PathInfo, calculate_pathplan=True, calculate_connectivity=True, calculate_disconnectivity=True):
+    def __init__(self, path, start_points,  info:PathInfo, calculate_pathplan=False, calculate_connectivity=False, calculate_disconnectivity=False):
 
         # self.hovering = info.hovering
         # self.realtime_conumber_of_nodesectivity = info.realtime_conumber_of_nodesectivity
@@ -91,11 +91,11 @@ class PathSolution():
             self.get_pathplan() # Calculates drone dict and path matrix (not interpolated, directly from the path sequenumber_of_cellse and start points)
         
         if calculate_connectivity:
-            if model != distance_soo_model:
-                self.do_connectivity_calculations()
+            # print("connectivity calculations")
+            self.do_connectivity_calculations()
         if calculate_disconnectivity:
-            if model == moo_model_with_disconn:
-                self.do_disconnectivity_calculations()
+            # print("disconnectivity calculations")
+            self.do_disconnectivity_calculations()
 
 
     def get_drone_dict(self):
@@ -174,7 +174,7 @@ class PathSolution():
 
         # APPLY HOVERING TO DRONES WITH SHORTER PATHS (ONLY IF MOO)
 
-        if info.model != distance_soo_model:
+        if info.model != time_ga_model:
 
             # drone_dict = {k:v for k,v in self.drone_dict.items() if k!=-1}
             # print(f"Dict Values Object: {list(drone_dict.items())}")

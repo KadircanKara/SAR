@@ -11,7 +11,7 @@ from pymoo.core.duplicate import NoDuplicateElimination
 # CHANGE INPUTS FROM HERE !!!
 
 # MODEL
-model = moo_model_with_disconn
+model = time_ga_model
 
 # ALG
 pop_size = 200

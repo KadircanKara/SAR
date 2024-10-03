@@ -22,8 +22,8 @@ def limit_cell_range(sol:PathSolution):
     return cell_range - 3
 
 def max_mission_time(sol:PathSolution):
-    return sol.mission_time - (sol.info.min_visits * 1000)
-    # return sol.mission_time - 1000
+    # return sol.mission_time - (sol.info.min_visits * 1000)
+    return sol.mission_time - 1800
 
 def get_mission_time(sol:PathSolution):
     return sol.mission_time
@@ -253,10 +253,10 @@ def path_speed_violations_as_constraint(sol:PathSolution):
 
     # print(f"Path: {sol.path}, Speed Violations: {sol.path_speed_violations}")
 
-    if sol.info.min_visits > 2:
-        return sol.path_speed_violations - 1
-    else:
-        return sol.path_speed_violations
+    # if sol.info.min_visits > 2:
+    #     return sol.path_speed_violations - 1
+    # else:
+    return sol.path_speed_violations
     
     # return sol.path_speed_violations - (sol.info.min_visits - 1)
 

@@ -5,163 +5,199 @@ from PathSolution import *
 from PathInfo import *
 from TimeBetweenVisits import calculate_mean_tbv
 
+from collections import defaultdict
+
 import os
+import shutil
 
-minv_scenarios = []
-minv_objs = []
-minv_sols = []
+'''def zip_folders(folder1, folder2, )
+# Paths of folders to compress
+folder1 = '/path/to/folder1'
+folder2 = '/path/to/folder2'
 
-obj_dir = os.listdir(objective_values_filepath)
-sol_dir = os.listdir(solutions_filepath)
-for minv in range(1,4):
-    minv_scenarios.append(np.array([x.split("-")[0] for x in obj_dir if (f"minv_{minv}" in x) and ("time_conn_disconn" in x)]))
-    minv_objs.append(np.array([x for x in obj_dir if (f"minv_{minv}" in x) and ("time_conn_disconn" in x)]))
-    minv_sols.append(np.array([x for x in sol_dir if (f"minv_{minv}" in x) and ("time_conn_disconn" in x)]))
+# Temporary directory to copy folders for compression
+temp_dir = '/path/to/temp_dir'
 
-# print(load_pickle(f"Results/Objectives/{minv_objs[0][0]}"))
-# for x in minv_objs[0]:
-#     print(min(load_pickle(f"Results/Objectives/{x}")["Mission Time"]))
+# Copy both folders to a temporary directory
+shutil.copytree(folder1, os.path.join(temp_dir, 'folder1'))
+shutil.copytree(folder2, os.path.join(temp_dir, 'folder2'))
+
+# Create the archive (choose zip or tar)
+shutil.make_archive('combined_archive', 'zip', temp_dir)
+
+# Cleanup: Optionally, remove the temporary folder after compression
+shutil.rmtree(temp_dir)
+'''
+def get_visit_times(sol:PathSolution):
+    info = sol.info
+    drone_path_matrix = sol.real_time_path_matrix[1:,:]
+    visit_times = [[] for _ in range(info.number_of_cells)]
+    # print(f"Path Matrix:\n{drone_path_matrix}")
+    for cell in range(info.number_of_cells):
+        # print(f"cell {cell} visit steps: {np.where(sol.real_time_path_matrix==cell)[1].tolist()}")
+        visit_times[cell] = np.sort(np.where(drone_path_matrix==cell)[1])[:info.min_visits] # Last bit is to exclude hovering steps
+    return visit_times
+
+def calculate_tbv(visit_times):
+    # print(visit_times)
+    tbv = [np.diff(x) for x in visit_times]
+    return tbv
+
+def calculate_mean_tbv(sol:PathSolution):
+    info = sol.info
+    drone_path_matrix = sol.real_time_path_matrix[1:,:]
+    visit_times = [[] for _ in range(info.number_of_cells)]
+    tbv = visit_times.copy()
+    # print(f"Path Matrix:\n{drone_path_matrix}")
+    for cell in range(info.number_of_cells):
+        # print(f"cell {cell} visit steps: {np.where(sol.real_time_path_matrix==cell)[1].tolist()}")
+        visit_times[cell] = np.sort(np.where(drone_path_matrix==cell)[1])[:info.min_visits] # Last bit is to exclude hovering steps
+        tbv[cell] = np.diff(visit_times[cell])
+    return visit_times, list(map(lambda x: np.mean(x), tbv))
 
 
-# Plot Mission Time and Percentage Connectivity for different number of visits for r = 2
-r=2
-number_of_drones = [4,8,12,16]
-# 1 Visit
-n_4_r_2_v_1_objective_values = pd.read_pickle("Results/Objectives/MOO_NSGA2_time_conn_disconn_g_8_a_50_n_4_v_2.5_r_2_minv_1_maxv_5_Nt_1_tarPos_12_ptdet_0.99_pfdet_0.01_detTh_0.9_maxIso_0-ObjectiveValues.pkl")
-n_8_r_2_v_1_objective_values = pd.read_pickle("Results/Objectives/MOO_NSGA2_time_conn_disconn_g_8_a_50_n_8_v_2.5_r_2_minv_1_maxv_5_Nt_1_tarPos_12_ptdet_0.99_pfdet_0.01_detTh_0.9_maxIso_0-ObjectiveValues.pkl")
-n_12_r_2_v_1_objective_values = pd.read_pickle("Results/Objectives/MOO_NSGA2_time_conn_disconn_g_8_a_50_n_12_v_2.5_r_2_minv_1_maxv_5_Nt_1_tarPos_12_ptdet_0.99_pfdet_0.01_detTh_0.9_maxIso_0-ObjectiveValues.pkl")
-n_16_r_2_v_1_objective_values = pd.read_pickle("Results/Objectives/MOO_NSGA2_time_conn_disconn_g_8_a_50_n_16_v_2.5_r_2_minv_1_maxv_5_Nt_1_tarPos_12_ptdet_0.99_pfdet_0.01_detTh_0.9_maxIso_0-ObjectiveValues.pkl")
 
-n_4_r_2_v_1_best_mission_time, n_4_r_2_v_1_best_percentage_connectivity = min(n_4_r_2_v_1_objective_values["Mission Time"]), max(n_4_r_2_v_1_objective_values["Percentage Connectivity"])
-n_8_r_2_v_1_best_mission_time, n_8_r_2_v_1_best_percentage_connectivity = min(n_8_r_2_v_1_objective_values["Mission Time"]), max(n_8_r_2_v_1_objective_values["Percentage Connectivity"])
-n_12_r_2_v_1_best_mission_time, n_12_r_2_v_1_best_percentage_connectivity = min(n_12_r_2_v_1_objective_values["Mission Time"]), max(n_12_r_2_v_1_objective_values["Percentage Connectivity"])
-n_16_r_2_v_1_best_mission_time, n_16_r_2_v_1_best_percentage_connectivity = min(n_16_r_2_v_1_objective_values["Mission Time"]), max(n_16_r_2_v_1_objective_values["Percentage Connectivity"])
+def plot_best_objs_for_nvisits(r, numbers_of_drones:list, numbers_of_visits:list, show=False, save=True):
 
-v_1_r_2_best_mission_times = [n_4_r_2_v_1_best_mission_time, n_8_r_2_v_1_best_mission_time, n_12_r_2_v_1_best_mission_time, n_16_r_2_v_1_best_mission_time]
-v_1_r_2_best_percentage_connectivities = [n_4_r_2_v_1_best_percentage_connectivity, n_8_r_2_v_1_best_percentage_connectivity, n_12_r_2_v_1_best_percentage_connectivity, n_16_r_2_v_1_best_percentage_connectivity]
+    # directions = ["Best", "Mid", "Worst"]
+    info_dict=PathInfo()
+    info_dict.comm_cell_range = r
 
-# 2 Visits
-n_4_r_2_v_2_objective_values = pd.read_pickle("Results/Objectives/MOO_NSGA2_time_conn_disconn_g_8_a_50_n_4_v_2.5_r_2_minv_2_maxv_5_Nt_1_tarPos_12_ptdet_0.99_pfdet_0.01_detTh_0.9_maxIso_0-ObjectiveValues.pkl")
-n_8_r_2_v_2_objective_values = pd.read_pickle("Results/Objectives/MOO_NSGA2_time_conn_disconn_g_8_a_50_n_8_v_2.5_r_2_minv_2_maxv_5_Nt_1_tarPos_12_ptdet_0.99_pfdet_0.01_detTh_0.9_maxIso_0-ObjectiveValues.pkl")
-n_12_r_2_v_2_objective_values = pd.read_pickle("Results/Objectives/MOO_NSGA2_time_conn_disconn_g_8_a_50_n_12_v_2.5_r_2_minv_2_maxv_5_Nt_1_tarPos_12_ptdet_0.99_pfdet_0.01_detTh_0.9_maxIso_0-ObjectiveValues.pkl")
-n_16_r_2_v_2_objective_values = pd.read_pickle("Results/Objectives/MOO_NSGA2_time_conn_disconn_g_8_a_50_n_16_v_2.5_r_2_minv_2_maxv_5_Nt_1_tarPos_12_ptdet_0.99_pfdet_0.01_detTh_0.9_maxIso_0-ObjectiveValues.pkl")
+    y_values_list = [ dict() for _ in range(len(numbers_of_visits))]
+
+    for i,v in enumerate(numbers_of_visits):
+        info_dict.min_visits = v
+        for n in numbers_of_drones:
+            info_dict.number_of_drones = n
+            scenario = str(info_dict)
+            v_visits_n_drones_all_objective_values = pd.read_pickle(f"{objective_values_filepath}{scenario}-ObjectiveValues.pkl")
+            objective_names = v_visits_n_drones_all_objective_values.columns
+            for objective in objective_names:
+                # print(y_values_list[v])
+                if objective not in list(y_values_list[i].keys()):
+                    y_values_list[i][objective] = []
+                # print(y_values_list[v])
+                # y_values_list[v][objective]
+                # fig, ax = plt.subplots()
+                # ax.set_xticks(numbers_of_drones)
+                # ax.grid()
+                v_visits_n_drones_objective_values = v_visits_n_drones_all_objective_values[objective]
+                best_objective_value = min(v_visits_n_drones_objective_values) if objective != "Percentage Connectivity" else max(v_visits_n_drones_objective_values)
+                y_values_list[i][objective].append(best_objective_value)
 
 
-n_4_r_2_v_2_best_mission_time, n_4_r_2_v_2_best_percentage_connectivity = min(n_4_r_2_v_2_objective_values["Mission Time"]), max(n_4_r_2_v_2_objective_values["Percentage Connectivity"])
-n_8_r_2_v_2_best_mission_time, n_8_r_2_v_2_best_percentage_connectivity = min(n_8_r_2_v_2_objective_values["Mission Time"]), max(n_8_r_2_v_2_objective_values["Percentage Connectivity"])
-n_12_r_2_v_2_best_mission_time, n_12_r_2_v_2_best_percentage_connectivity = min(n_12_r_2_v_2_objective_values["Mission Time"]), max(n_12_r_2_v_2_objective_values["Percentage Connectivity"])
-n_16_r_2_v_2_best_mission_time, n_16_r_2_v_2_best_percentage_connectivity = min(n_16_r_2_v_2_objective_values["Mission Time"]), max(n_16_r_2_v_2_objective_values["Percentage Connectivity"])
+    # PLOT
 
-v_2_r_2_best_mission_times = [n_4_r_2_v_2_best_mission_time, n_8_r_2_v_2_best_mission_time, n_12_r_2_v_2_best_mission_time, n_16_r_2_v_2_best_mission_time]
-v_2__r_2_best_percentage_connectivities = [n_4_r_2_v_2_best_percentage_connectivity, n_8_r_2_v_2_best_percentage_connectivity, n_12_r_2_v_2_best_percentage_connectivity, n_16_r_2_v_2_best_percentage_connectivity]
+    if r == 2*sqrt(2):
+        r = sp.sqrt(round(r**2))
 
-# 3 Visits
-n_4_r_2_v_3_objective_values = pd.read_pickle("Results/Objectives/MOO_NSGA2_time_conn_disconn_g_8_a_50_n_4_v_2.5_r_2_minv_3_maxv_5_Nt_1_tarPos_12_ptdet_0.99_pfdet_0.01_detTh_0.9_maxIso_0-ObjectiveValues.pkl")
-n_8_r_2_v_3_objective_values = pd.read_pickle("Results/Objectives/MOO_NSGA2_time_conn_disconn_g_8_a_50_n_8_v_2.5_r_2_minv_3_maxv_5_Nt_1_tarPos_12_ptdet_0.99_pfdet_0.01_detTh_0.9_maxIso_0-ObjectiveValues.pkl")
-n_12_r_2_v_3_objective_values = pd.read_pickle("Results/Objectives/MOO_NSGA2_time_conn_disconn_g_8_a_50_n_12_v_2.5_r_2_minv_3_maxv_5_Nt_1_tarPos_12_ptdet_0.99_pfdet_0.01_detTh_0.9_maxIso_0-ObjectiveValues.pkl")
-n_16_r_2_v_3_objective_values = pd.read_pickle("Results/Objectives/MOO_NSGA2_time_conn_disconn_g_8_a_50_n_16_v_2.5_r_2_minv_3_maxv_5_Nt_1_tarPos_12_ptdet_0.99_pfdet_0.01_detTh_0.9_maxIso_0-ObjectiveValues.pkl")
+    # print("-->", r)
 
-n_4_r_2_v_3_best_mission_time, n_4_r_2_v_3_best_percentage_connectivity = min(n_4_r_2_v_3_objective_values["Mission Time"]), max(n_4_r_2_v_3_objective_values["Percentage Connectivity"])
-n_8_r_2_v_3_best_mission_time, n_8_r_2_v_3_best_percentage_connectivity = min(n_8_r_2_v_3_objective_values["Mission Time"]), max(n_8_r_2_v_3_objective_values["Percentage Connectivity"])
-n_12_r_2_v_3_best_mission_time, n_12_r_2_v_3_best_percentage_connectivity = min(n_12_r_2_v_3_objective_values["Mission Time"]), max(n_12_r_2_v_3_objective_values["Percentage Connectivity"])
-n_16_r_2_v_3_best_mission_time, n_16_r_2_v_3_best_percentage_connectivity = min(n_16_r_2_v_3_objective_values["Mission Time"]), max(n_16_r_2_v_3_objective_values["Percentage Connectivity"])
-
-v_3_r_2_best_mission_times = [n_4_r_2_v_3_best_mission_time, n_8_r_2_v_3_best_mission_time, n_12_r_2_v_3_best_mission_time, n_16_r_2_v_3_best_mission_time]
-v_3__r_2_best_percentage_connectivities = [n_4_r_2_v_3_best_percentage_connectivity, n_8_r_2_v_3_best_percentage_connectivity, n_12_r_2_v_3_best_percentage_connectivity, n_16_r_2_v_3_best_percentage_connectivity]
-
-# Plot
-# Create a figure and axis
-fig, ax = plt.subplots()
-ax.set_xticks(number_of_drones)
-ax.grid()
-# Plot each scatter plot and connect them with lines
-ax.scatter(number_of_drones, v_1_r_2_best_mission_times, color='red', label='1 Visit')
-ax.plot(number_of_drones, v_1_r_2_best_mission_times, color='red')
-ax.scatter(number_of_drones, v_2_r_2_best_mission_times, color='green', label='2 Visits')
-ax.plot(number_of_drones, v_2_r_2_best_mission_times, color='green')
-ax.scatter(number_of_drones, v_3_r_2_best_mission_times, color='blue', label='3 Visits')
-ax.plot(number_of_drones, v_3_r_2_best_mission_times, color='blue')
-# Add a legend to the plot
-ax.legend()
-# Add axis labels and a title
-ax.set_xlabel('Number of Drones')
-ax.set_ylabel('Mission Time')
-ax.set_title('Mission Time for Different Number of Visits')
-
-# Create a figure and axis
-fig, ax = plt.subplots()
-ax.set_xticks(number_of_drones)
-ax.grid()
-# Plot each scatter plot and connect them with lines
-ax.scatter(number_of_drones, v_1_r_2_best_percentage_connectivities, color='red', label='1 Visit')
-ax.plot(number_of_drones, v_1_r_2_best_percentage_connectivities, color='red')
-ax.scatter(number_of_drones, v_2__r_2_best_percentage_connectivities, color='green', label='2 Visits')
-ax.plot(number_of_drones, v_2__r_2_best_percentage_connectivities, color='green')
-ax.scatter(number_of_drones, v_3__r_2_best_percentage_connectivities, color='blue', label='3 Visits')
-ax.plot(number_of_drones, v_3__r_2_best_percentage_connectivities, color='blue')
-# Add a legend to the plot
-ax.legend()
-# Add axis labels and a title
-ax.set_xlabel('Number of Drones')
-ax.set_ylabel('Percentage Connectivity')
-ax.set_title('Percentage Connectivity for Different Number of Visits')
-
-# Plot Pareto Fronts
-def plot_pareto_front(mission_time_values, percentage_connectivity_values, title, show=False):
-    """
-    Plots a Pareto front for two objectives: mission time and percentage connectivity.
+    x = numbers_of_drones
+    for objective in objective_names:
+        objective_with_underscore = objective.replace(" ", "_")
+        # Create a figure and axis
+        fig, ax = plt.subplots()
+        ax.set_xticks(numbers_of_drones)
+        ax.grid()
+        # Add axis labels and a title
+        ax.set_xlabel('Number of Drones')
+        ax.set_ylabel(objective)
+        ax.set_title(f'{objective} for Different Number of Visits and {r} Cell(s) Communication Range', fontsize="small")
+        for i,v in enumerate(numbers_of_visits):
+            y = y_values_list[i][objective]
+            ax.scatter(x, y, label=f'{v} Visit(s)')
+            # Annotate Scatter Plot
+            for i in range(len(x)):
+                ax.annotate(f'{round(y[i], 2)}', (x[i], y[i]), textcoords="offset points", xytext=(0,5), ha='center')
+            ax.plot(x, y)
+        # Add a legend to the plot
+        ax.legend()
+        # Save plot
+        if save:
+            plt.savefig(f"Figures/Objective Values/r_{r}_n_{numbers_of_drones}_v_{numbers_of_visits}_{objective_with_underscore}.png")
     
-    Args:
-        mission_time_values (list or array): Values for mission time (Objective 1).
-        percentage_connectivity_values (list or array): Values for percentage connectivity (Objective 2).
-    """
-    # Create a figure and axis
-    fig, ax = plt.subplots()
-    ax.grid()
-    # Scatter plot of the two objectives
-    ax.scatter(mission_time_values, percentage_connectivity_values, color='blue', label='Pareto Points')
-    # Connecting points with lines
-    # ax.plot(mission_time_values, percentage_connectivity_values, color='blue')
-    # Set labels and title
-    ax.set_xlabel('Mission Time')
-    ax.set_ylabel('Percentage Connectivity')
-    ax.set_title(title)
-    # Add a legend
-    ax.legend()
-    # Optionally, invert y-axis if a higher percentage is better (to show "better" values going up)
-    # ax.invert_yaxis()
     if show:
-        # Show the plot
         plt.show()
 
-    return None
 
-plot_pareto_front(n_8_r_2_v_1_objective_values["Mission Time"], n_8_r_2_v_1_objective_values["Percentage Connectivity"], "8 Drones, 2 Cell Range, 1 Visit Pareto Front")
-plot_pareto_front(n_8_r_2_v_2_objective_values["Mission Time"], n_8_r_2_v_2_objective_values["Percentage Connectivity"], "8 Drones, 2 Cell Range, 2 Visits Pareto Front")
-plot_pareto_front(n_8_r_2_v_3_objective_values["Mission Time"], n_8_r_2_v_3_objective_values["Percentage Connectivity"], "8 Drones, 2 Cell Range, 3 Visits Pareto Front")
+def plot_dist_to_bs_vs_time_between_visits(info:PathInfo, show=False, save=True):
+
+    scenario = str(info)
+    brief_scenario = f"n_{info.number_of_drones}_r_{info.comm_cell_range}_v_{info.min_visits}" if info.comm_cell_range != 2*sqrt(2) else f"n_{info.number_of_drones}_r_{sp.sqrt(round(info.comm_cell_range**2))}_v_{info.min_visits}"
+    save_as = f"{info.model['Type']}_{info.model['Alg']}_{info.model['Exp']}_n_{info.number_of_drones}_r_{info.comm_cell_range}_v_{info.min_visits}" if info.comm_cell_range != 2*sqrt(2) else f"{info.model['Type']}_{info.model['Alg']}_{info.model['Exp']}_n_{info.number_of_drones}_r_{sp.sqrt(round(info.comm_cell_range**2))}_v_{info.min_visits}"
+    # print(scenario)
+
+    scenario_all_objective_values = pd.read_pickle(f"{objective_values_filepath}{scenario}-ObjectiveValues.pkl")
+    objective_names = scenario_all_objective_values.columns
+
+    dist_to_bs = info.D[-1][:-1]
+    # print(f"Dist to BS: {dist_to_bs}, Len: {len(dist_to_bs)}")
+
+    directions = ["Best"]
+
+    for objective in objective_names:
+
+        # Create a figure and axis
+        fig, ax = plt.subplots()
+        hist_fig, hist_ax = plt.subplots()
+        # ax.set_xticks(dist_to_bs)
+        ax.grid(axis='y')
+        # Add axis labels and a title
+        ax.set_xlabel('Distance to BS')
+        ax.set_ylabel("Mean Time Between Visits")
+
+        hist_ax.set_xlabel('Mean Time Between Visits')
+        hist_ax.set_ylabel("Frequency")
+
+        objective_with_underscore = objective.replace(" ","_")
+        # objective_values = scenario_all_objective_values[objective]
+        # best_objective_value_ind = objective_values.idxmin() if objective != "Percentage Connectivity" else objective_values.idxmax()
+        for dir in directions:
+            sol = load_pickle(f"{solutions_filepath}{scenario}-{dir}-{objective_with_underscore}-Solution.pkl")
+            vt = get_visit_times(sol)
+            tbv = calculate_tbv(vt)
+            mean_tbv = [np.mean(x) for x in tbv]
+            cum_mean_tbv = np.mean(mean_tbv)
+            # sum_tbv = [np.sum(x) for x in tbv]
+            ax.set_title(f'{save_as} {dir} {objective} Solution Mean TBV', fontsize="small")
+            ax.scatter(dist_to_bs, mean_tbv, label="Mean TBV")
+            ax.plot(np.arange(ceil(max(dist_to_bs))+1), [cum_mean_tbv]*(ceil(max(dist_to_bs))+1), label = "Cumulative Mean TBV", color="blue")
+            ax.set_xlim([0,round(max(dist_to_bs))+1])
+            ax.set_xticks([min(dist_to_bs), np.mean(dist_to_bs), max(dist_to_bs)])
+            ax.legend()
+            bin_width = 1.0
+            bins = np.arange(min(mean_tbv), max(mean_tbv) + bin_width, bin_width)
+            # hist_ax.set_title(f'{scenario} {dir} {objective} Solution Mean TBV Histogram', fontsize="small")
+            hist_ax.set_title(f'{save_as} {dir} {objective} Solution Mean TBV', fontsize="small")
+            hist_ax.hist(mean_tbv, bins=bins, edgecolor='black')
+            # ax.scatter(dist_to_bs, sum_tbv, label="Sum TBV")
+            # Save Plot
+            if save:
+                fig.savefig(f"Figures/Time Between Visits/Distribution/{save_as}-{dir}-{objective_with_underscore}-mean_tbv_dist.png")
+                hist_fig.savefig(f"Figures/Time Between Visits/Histogram/{save_as}-{dir}-{objective_with_underscore}-mean_tbv_hist.png")
+                # Zip Archive
+                dist_folder = "Figures/Time Between Visits/Distribution"
+                hist_folder = "Figures/Time Between Visits/Histogram"
+        if show:
+            plt.show()
 
 
-# Show Plots
-plt.show()
 
 
+# comm_cell_range_values = [2, 2*sqrt(2), 4]
+# for r in comm_cell_range_values:
+#     plot_best_objs_for_nvisits(r, numbers_of_drones=[4,8,12,16], numbers_of_visits=[1,2,3], show=False, save=True)
 
 
-# minv_1_best_mission_times, minv_1_best_percentage_connectivities  = [], []
-# minv_2_best_mission_times, minv_2_best_percentage_connectivities  = [], []
-# minv_3_best_mission_times, minv_3_best_percentage_connectivities  = [], []
-# for n in number_of_drones:
-#     minv_1_mission_times, minv_1_percentage_connectivities = pd.read_pickle(f"Results/Objectives/{x}")["Mission Time"] for x in minv_objs[0] if (f"n_{n}" in x) and (f"r_{r}" in x)
-#     minv_2_mission_times, minv_2_percentage_connectivities =
-#     minv_3_mission_times, minv_3_percentage_connectivities =
-#     # 1 Visit
-#     minv_1_best_mission_times.append(min([pd.read_pickle(f"Results/Objectives/{x}")["Mission Time"] for x in minv_objs[0] if (f"n_{n}" in x) and (f"r_{r}" in x)]))
-#     minv_1_best_percentage_connectivities.append(max([pd.read_pickle(f"Results/Objectives/{x}")["Percentage Connectivity"] for x in minv_objs[0] if (f"n_{n}" in x) and (f"r_{r}" in x)]))
-#     # 2 Visits
-#     minv_2_best_mission_times.append(min([pd.read_pickle(f"Results/Objectives/{x}")["Mission Time"] for x in minv_objs[1] if (f"n_{n}" in x) and (f"r_{r}" in x)]))
-#     minv_2_best_percentage_connectivities.append(max([pd.read_pickle(f"Results/Objectives/{x}")["Percentage Connectivity"] for x in minv_objs[1] if (f"n_{n}" in x) and (f"r_{r}" in x)]))
-#     # 3 Visits
-#     minv_3_best_mission_times.append(min([pd.read_pickle(f"Results/Objectives/{x}")["Mission Time"] for x in minv_objs[2] if (f"n_{n}" in x) and (f"r_{r}" in x)]))
-#     minv_3_best_percentage_connectivities.append(max([pd.read_pickle(f"Results/Objectives/{x}")["Percentage Connectivity"] for x in minv_objs[2] if (f"n_{n}" in x) and (f"r_{r}" in x)]))
-
-# print(minv_1_best_mission_times)
+info = PathInfo()
+numbers_of_drones_values = [4,8,12,16]
+comm_cell_range_values = [2, 2*sqrt(2), 4]
+min_visits_values = [2,3]
+for n in numbers_of_drones_values:
+    info.number_of_drones = n
+    for r in comm_cell_range_values:
+        info.comm_cell_range = r
+        for v in min_visits_values:
+            info.min_visits = v
+            plot_dist_to_bs_vs_time_between_visits(info=info, show=False, save=True)

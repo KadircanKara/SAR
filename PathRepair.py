@@ -94,7 +94,7 @@ class PathRepair(Repair):
 
         while(len(new_path) < sol.info.number_of_cells * sol.info.min_visits):
 
-            # print(copy_path)
+            # print(len(new_path) < sol.info.number_of_cells * sol.info.min_visits)
             city = copy_path[0]
 
             copy_path.pop(0)

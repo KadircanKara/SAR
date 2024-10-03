@@ -152,7 +152,8 @@ def scx_crossover_test(p1:PathSolution, p2:PathSolution):
 
 
 # Sequential Combination Crossover (1-offspring)
-def scx_crossover(p1: PathSolution, p2: PathSolution):
+'''def scx_crossover(p1: PathSolution, p2: PathSolution):
+
     info = p1.info
 
     p1_path = p1.path
@@ -200,10 +201,12 @@ def scx_crossover(p1: PathSolution, p2: PathSolution):
     for idx, city in enumerate(offspring):
         if city == -1:
             raise ValueError(f"Offspring city at index {idx} is not filled properly.")
+        
+    print(f"offspring: {offspring}, len unique: {len(np.unique(offspring))}")
 
     return PathSolution(offspring, p1.start_points, info), PathSolution(offspring, p2.start_points, info)
-
-'''def scx_crossover(p1:PathSolution, p2:PathSolution):
+'''
+def scx_crossover(p1:PathSolution, p2:PathSolution):
     info = p1.info
 
     p1_path = p1.path
@@ -238,7 +241,7 @@ def scx_crossover(p1: PathSolution, p2: PathSolution):
     p1_sp_sol, p2_sp_sol = PathSolution(offspring, p1.start_points, info), PathSolution(offspring, p2.start_points, info)
 
     return p1_sp_sol, p2_sp_sol
-'''
+
 
 # Ordered Crossover (2-offsprings)
 def ox_crossover(p1: PathSolution, p2: PathSolution):

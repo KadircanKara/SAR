@@ -16,7 +16,7 @@ import shutil
 # from google.colab import drive
 # drive.mount('/content/drive')
 
-from PathOptimizationModel import moo_model_with_disconn, distance_soo_model
+from PathOptimizationModel import *
 from PathInput import *
 # from main import *
 from FilePaths import *
