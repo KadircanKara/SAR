@@ -8,14 +8,16 @@ from PathOptimizationModel import *
 from pymoo.core.duplicate import NoDuplicateElimination
 
 
-# CHANGE INPUTS FROM HERE !!!
+# CHANGE ALGORITHM INPUTS FROM HERE !!!
 
 # MODEL
-model = time_ga_model
+model = time_conn_disconn_nsga3_model
 
 # ALG
-pop_size = 200
+pop_size = 100
 n_gen = 3000
+
+"""
 
 # OPERATORS
 # path_sampling = PathSampling()
@@ -194,3 +196,5 @@ for i in range(len(two_visits_setup_scenarios)):
     three_visits_setup_scenarios[i]["min_visits"] = 3
     four_visits_setup_scenarios[i]["min_visits"] = 4
     five_visits_setup_scenarios[i]["min_visits"] = 5
+
+"""

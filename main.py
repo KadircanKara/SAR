@@ -9,19 +9,17 @@ from PathUnitTest import *
 
 import os
 from math import sqrt
+from PathInput import *
 # import sympy as sp
 
-
-pop_size = 100
-gen_size = 3000
 
 scenario = {
                         'grid_size': 8,
                         'cell_side_length': 50,
-                        'number_of_drones': 4,
+                        'number_of_drones': 8,
                         'max_drone_speed': 2.5, # m/s
                         'comm_cell_range': 2,  # 4 cells
-                        'min_visits': 2,  # Minimum number of cell visits
+                        'min_visits': 1,  # Minimum number of cell visits
                         'max_visits':5, # Maximum number of cell visits
                         'number_of_targets': 1,
                         'target_positions':12,
@@ -85,11 +83,11 @@ path_mutation = PathMutation({
                     # "reverse sequence": (0.3, 1),
                     "block inversion": (0, 1),
                     # "shift": (0.3, 1),
-                    "random_one_sp_mutation": (0, 1), # 1.0 for 4 drones |  0.95 for 8 drones | 0.7 for 12 drones | 0.5 for 16 drones
-                    "random_n_sp_mutation": (1, 1), # 1.0 for 4 drones |  0.95 for 8 drones | 0.7 for 12 drones | 0.5 for 16 drones
-                    "all_sp_mutation": (0, 1), # 1.0 for 4 drones |  0.95 for 8 drones | 0.7 for 12 drones | 0.5 for 16 drones
-                    "longest_path_sp_mutation": (0, 1), # 1.0 for 4 drones |  0.95 for 8 drones | 0.7 for 12 drones | 0.5 for 16 drones
-                    "randomly_selected_sp_mutation": (0, 1), # 1.0 for 4 drones |  0.95 for 8 drones | 0.7 for 12 drones | 0.5 for 16 drones
+                    "random_one_sp_mutation": (1.0, 1), # 1.0 for 4 drones |  0.95 for 8 drones | 0.7 for 12 drones | 0.5 for 16 drones
+                    "random_n_sp_mutation": (0.0, 1), # 1.0 for 4 drones |  0.95 for 8 drones | 0.7 for 12 drones | 0.5 for 16 drones
+                    "all_sp_mutation": (0.0, 1), # 1.0 for 4 drones |  0.95 for 8 drones | 0.7 for 12 drones | 0.5 for 16 drones
+                    "longest_path_sp_mutation": (0.0, 1), # 1.0 for 4 drones |  0.95 for 8 drones | 0.7 for 12 drones | 0.5 for 16 drones
+                    "randomly_selected_sp_mutation": (0.0, 1), # 1.0 for 4 drones |  0.95 for 8 drones | 0.7 for 12 drones | 0.5 for 16 drones
                 })
 
 # CROSSOVER
@@ -101,21 +99,18 @@ path_repair = PathRepair()
 # DUPLICATES
 path_eliminate_duplicates = NoDuplicateElimination()
 
-
-
-
-def run_n_visit_scenarios(n:int, save_results=True, animation=False, copy_to_drive=False):
-    n_dict = {  
-                0: test_setup_scenario,
-                1: single_visit_setup_scenarios,
-                2: two_visits_setup_scenarios,
-                3: three_visits_setup_scenarios,
-                4: four_visits_setup_scenarios,
-                5: five_visits_setup_scenarios
-    }
-    scenario = n_dict[n]
-    test = PathUnitTest(scenario)
-    test(save_results, animation, copy_to_drive)
+# def run_n_visit_scenarios(n:int, save_results=True, animation=False, copy_to_drive=False):
+#     n_dict = {  
+#                 0: test_setup_scenario,
+#                 1: single_visit_setup_scenarios,
+#                 2: two_visits_setup_scenarios,
+#                 3: three_visits_setup_scenarios,
+#                 4: four_visits_setup_scenarios,
+#                 5: five_visits_setup_scenarios
+#     }
+#     scenario = n_dict[n]
+#     test = PathUnitTest(scenario)
+#     test(save_results, animation, copy_to_drive)
 
 if __name__ == "__main__":
 

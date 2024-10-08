@@ -28,6 +28,7 @@ shutil.make_archive('combined_archive', 'zip', temp_dir)
 # Cleanup: Optionally, remove the temporary folder after compression
 shutil.rmtree(temp_dir)
 '''
+
 def get_visit_times(sol:PathSolution):
     info = sol.info
     drone_path_matrix = sol.real_time_path_matrix[1:,:]
@@ -121,7 +122,70 @@ def plot_best_objs_for_nvisits(r, numbers_of_drones:list, numbers_of_visits:list
         plt.show()
 
 
-def plot_dist_to_bs_vs_time_between_visits(info:PathInfo, show=False, save=True):
+def plot_time_between_visits_vs_number_of_drones(model:dict, r_values:list, numbers_of_drones:list, numbers_of_visits:list, show=True, save=False):
+    """Take the best objective solutions for the required scenarios and plot tbv vs number of drones"""
+
+    assert (1 not in numbers_of_visits), "1 Should not be in numbers of visits"
+
+    x = numbers_of_drones
+
+    # objective_names = []
+
+    # y_values_list = [ np.zeros(len(numbers_of_drones)) for _ in range(len(numbers_of_visits))]
+
+    best_solutions_filenames = [x for x in os.listdir("Results/Solutions") if "SolutionObjects" not in x and "Best" in x]
+    objective_names = model["F"] # list(set([x.split("-")[2].replace("_", " ") for x in best_solutions_filenames]))
+    best_solutions = [load_pickle(f"{solutions_filepath}{x}") for x in best_solutions_filenames]
+    infos_of_best_solutions = [x.info for x in best_solutions]
+
+    # n_12_filenames = [x for x in best_solutions_filenames if "n_12" in x and "r_2" in x and "r_2*sqrt(2)" not in x and "Mission_Time" in x]
+    # print(np.array(n_12_filenames))
+
+    for r_comm in r_values:
+        for obj in objective_names:
+            fig, ax = plt.subplots()
+            ax.set_xticks(numbers_of_drones)
+            ax.grid()
+            for n_visits in numbers_of_visits:
+                y = []
+                for n_drones in numbers_of_drones:
+                    
+                    print(obj, n_drones, r_comm, n_visits)
+                    n_drones_r_comm_n_visits_best_obj_solution = [
+                                                                    best_solutions[i] for i in range(len(best_solutions)) if infos_of_best_solutions[i].model["F"]==model["F"] # Filter model parameters
+                                                                    and infos_of_best_solutions[i].model["Type"]==model["Type"] 
+                                                                    and infos_of_best_solutions[i].model["Exp"]==model["Exp"] 
+                                                                    and infos_of_best_solutions[i].model["Alg"]==model["Alg"] # Filter model parameters
+                                                                    and infos_of_best_solutions[i].min_visits==n_visits 
+                                                                    and infos_of_best_solutions[i].number_of_drones==n_drones 
+                                                                    and infos_of_best_solutions[i].comm_cell_range==r_comm # Filter scenario parameters
+                                                                    and obj.replace(" ","_") in best_solutions_filenames[i] # Filter objective
+                                                                ][0]
+                    # Get cumulative mean
+                    vt = get_visit_times(n_drones_r_comm_n_visits_best_obj_solution)
+                    tbv = calculate_tbv(vt)
+                    mean_tbv = [np.mean(x) for x in tbv]
+                    cum_mean_tbv = np.mean(mean_tbv)
+                    # Append cumulative mean tbv to y
+                    y.append(cum_mean_tbv)
+                # Scatter Plot
+                ax.scatter(x, y)
+                ax.plot(x, y, label=f"{n_visits} visit(s)")
+                
+            ax.set_title(f"n: {n_drones}, r: {sp.sqrt(round(r_comm**2))} Best {obj} Solution Cumulative Mean TBV", fontsize="medium")
+            ax.legend()
+
+            # plt.show()
+
+    if show:
+        plt.show()
+
+
+def plot_time_between_visits_vs_dist_to_bs(info:PathInfo, show=False, save=True):
+
+    mean_tbv_vs_dist_to_bs_dist_folder = "Figures/Time Between Visits/Distance to BS vs Mean TBV/Distribution/"
+    mean_tbv_vs_dist_to_bs_hist_folder = "Figures/Time Between Visits/Distance to BS vs Mean TBV/Histogram/"
+    cum_mean_tbv_vs_number_of_drones_folder = "Figures/Time Between Visits/Cumulative Mean TBV vs Number of Drones/"
 
     scenario = str(info)
     brief_scenario = f"n_{info.number_of_drones}_r_{info.comm_cell_range}_v_{info.min_visits}" if info.comm_cell_range != 2*sqrt(2) else f"n_{info.number_of_drones}_r_{sp.sqrt(round(info.comm_cell_range**2))}_v_{info.min_visits}"
@@ -139,16 +203,16 @@ def plot_dist_to_bs_vs_time_between_visits(info:PathInfo, show=False, save=True)
     for objective in objective_names:
 
         # Create a figure and axis
-        fig, ax = plt.subplots()
-        hist_fig, hist_ax = plt.subplots()
+        mean_tbv_vs_dist_to_bs_dist_fig, mean_tbv_vs_dist_to_bs_dist_ax = plt.subplots()
+        mean_tbv_vs_dist_to_bs_hist_fig, mean_tbv_vs_dist_to_bs_hist_ax = plt.subplots()
         # ax.set_xticks(dist_to_bs)
-        ax.grid(axis='y')
+        mean_tbv_vs_dist_to_bs_dist_ax.grid(axis='y')
         # Add axis labels and a title
-        ax.set_xlabel('Distance to BS')
-        ax.set_ylabel("Mean Time Between Visits")
+        mean_tbv_vs_dist_to_bs_dist_ax.set_xlabel('Distance to BS')
+        mean_tbv_vs_dist_to_bs_dist_ax.set_ylabel("Mean Time Between Visits")
 
-        hist_ax.set_xlabel('Mean Time Between Visits')
-        hist_ax.set_ylabel("Frequency")
+        mean_tbv_vs_dist_to_bs_hist_ax.set_xlabel('Mean Time Between Visits')
+        mean_tbv_vs_dist_to_bs_hist_ax.set_ylabel("Frequency")
 
         objective_with_underscore = objective.replace(" ","_")
         # objective_values = scenario_all_objective_values[objective]
@@ -160,44 +224,43 @@ def plot_dist_to_bs_vs_time_between_visits(info:PathInfo, show=False, save=True)
             mean_tbv = [np.mean(x) for x in tbv]
             cum_mean_tbv = np.mean(mean_tbv)
             # sum_tbv = [np.sum(x) for x in tbv]
-            ax.set_title(f'{save_as} {dir} {objective} Solution Mean TBV', fontsize="small")
-            ax.scatter(dist_to_bs, mean_tbv, label="Mean TBV")
-            ax.plot(np.arange(ceil(max(dist_to_bs))+1), [cum_mean_tbv]*(ceil(max(dist_to_bs))+1), label = "Cumulative Mean TBV", color="blue")
-            ax.set_xlim([0,round(max(dist_to_bs))+1])
-            ax.set_xticks([min(dist_to_bs), np.mean(dist_to_bs), max(dist_to_bs)])
-            ax.legend()
+            mean_tbv_vs_dist_to_bs_dist_ax.set_title(f'{save_as} {dir} {objective} Solution Mean TBV', fontsize="small")
+            mean_tbv_vs_dist_to_bs_dist_ax.scatter(dist_to_bs, mean_tbv, label="Mean TBV")
+            mean_tbv_vs_dist_to_bs_dist_ax.plot(np.arange(ceil(max(dist_to_bs))+1), [cum_mean_tbv]*(ceil(max(dist_to_bs))+1), label = "Cumulative Mean TBV", color="blue")
+            mean_tbv_vs_dist_to_bs_dist_ax.set_xlim([0,round(max(dist_to_bs))+1])
+            mean_tbv_vs_dist_to_bs_dist_ax.set_xticks([min(dist_to_bs), np.mean(dist_to_bs), max(dist_to_bs)])
+            mean_tbv_vs_dist_to_bs_dist_ax.legend()
             bin_width = 1.0
             bins = np.arange(min(mean_tbv), max(mean_tbv) + bin_width, bin_width)
             # hist_ax.set_title(f'{scenario} {dir} {objective} Solution Mean TBV Histogram', fontsize="small")
-            hist_ax.set_title(f'{save_as} {dir} {objective} Solution Mean TBV', fontsize="small")
-            hist_ax.hist(mean_tbv, bins=bins, edgecolor='black')
+            mean_tbv_vs_dist_to_bs_hist_ax.set_title(f'{save_as} {dir} {objective} Solution Mean TBV', fontsize="small")
+            mean_tbv_vs_dist_to_bs_hist_ax.hist(mean_tbv, bins=bins, edgecolor='black')
             # ax.scatter(dist_to_bs, sum_tbv, label="Sum TBV")
             # Save Plot
             if save:
-                fig.savefig(f"Figures/Time Between Visits/Distribution/{save_as}-{dir}-{objective_with_underscore}-mean_tbv_dist.png")
-                hist_fig.savefig(f"Figures/Time Between Visits/Histogram/{save_as}-{dir}-{objective_with_underscore}-mean_tbv_hist.png")
-                # Zip Archive
-                dist_folder = "Figures/Time Between Visits/Distribution"
-                hist_folder = "Figures/Time Between Visits/Histogram"
-        if show:
-            plt.show()
+                mean_tbv_vs_dist_to_bs_dist_fig.savefig(f"{mean_tbv_vs_dist_to_bs_dist_folder}{save_as}-{dir}-{objective_with_underscore}-mean_tbv_dist.png")
+                mean_tbv_vs_dist_to_bs_hist_fig.savefig(f"{mean_tbv_vs_dist_to_bs_hist_folder}{save_as}-{dir}-{objective_with_underscore}-mean_tbv_hist.png")
+            if show:
+                plt.show()
 
 
+# if __name__ == "__main":
 
+# plot_time_between_visits_vs_number_of_drones(model=time_conn_disconn_nsga2_model, r_values=[2, 2*sqrt(2), 4], numbers_of_drones=[4,8,12,16], numbers_of_visits=[2,3], show=True, save=False)
 
-# comm_cell_range_values = [2, 2*sqrt(2), 4]
-# for r in comm_cell_range_values:
-#     plot_best_objs_for_nvisits(r, numbers_of_drones=[4,8,12,16], numbers_of_visits=[1,2,3], show=False, save=True)
-
-
-info = PathInfo()
-numbers_of_drones_values = [4,8,12,16]
 comm_cell_range_values = [2, 2*sqrt(2), 4]
-min_visits_values = [2,3]
-for n in numbers_of_drones_values:
-    info.number_of_drones = n
-    for r in comm_cell_range_values:
-        info.comm_cell_range = r
-        for v in min_visits_values:
-            info.min_visits = v
-            plot_dist_to_bs_vs_time_between_visits(info=info, show=False, save=True)
+for r in comm_cell_range_values:
+    plot_best_objs_for_nvisits(r, numbers_of_drones=[4,8,12,16], numbers_of_visits=[1,2,3], show=True, save=False)
+
+
+    # info = PathInfo()
+    # numbers_of_drones_values = [4,8,12,16]
+    # comm_cell_range_values = [2, 2*sqrt(2), 4]
+    # min_visits_values = [2,3]
+    # for n in numbers_of_drones_values:
+    #     info.number_of_drones = n
+    #     for r in comm_cell_range_values:
+    #         info.comm_cell_range = r
+    #         for v in min_visits_values:
+    #             info.min_visits = v
+    #             plot_time_between_visits_vs_dist_to_bs(info=info, show=False, save=True)

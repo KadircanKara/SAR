@@ -57,17 +57,22 @@ class PathUnitTest(object):
             
     def run_optimization(self, info):
 
+        problem = PathProblem(info)
+        algorithm = PathAlgorithm(self.algorithm)()
+        termination = ("n_gen", n_gen)
+        output = PathOutput(problem)
+
         res, F, X, R = None, None, None, None,
 
         t = time.time()
         t_start = time.time()
 
         res = minimize(problem=PathProblem(info),
-                        algorithm=PathAlgorithm(self.algorithm)(),
-                        termination=('n_gen',n_gen),
+                        algorithm=algorithm,
+                        termination=termination,
                         save_history=True,
                         seed=1,
-                        output=PathOutput(PathProblem(info)),
+                        output=output,
                         verbose=True,
                         )
         

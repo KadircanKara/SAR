@@ -190,7 +190,8 @@ class PathOutput(Output):
 
         # print(f"Smoothness Constraints:\n{np.hstack((G_cvs[:,1], H_cvs[:,1]))}")
         
-        if not all(isinstance(i, list) and len(i) == 0 for i in cvs):
+        # if not all(isinstance(i, list) and len(i) == 0 for i in cvs):
+        if len(self.problem.model["G"])!=0 and len(self.problem.model["H"])!=0:
             self.cv_min.set(np.min(sum_cvs))
             self.cv_avg.set(np.mean(sum_cvs))
 

@@ -51,11 +51,12 @@ from main import scenario, pop_size, path_eliminate_duplicates, path_sampling, p
 #     # n_max_evals=100000
 # )
 
+# pop_size = 100
 
 algorithm_dict = {
 
     'PSO': PSO(
-        pop_size=100,
+        pop_size=pop_size,
         sampling=path_sampling,
         # mutation=path_mutation,
         # crossover=path_crossover,
@@ -82,33 +83,35 @@ algorithm_dict = {
                 ),
 
     'MOEAD' : MOEAD(
-                    # pop_size=40,
                     ref_dirs=get_reference_directions("das-dennis", len(model['F']), n_partitions=12),
+                    # pop_size=len(get_reference_directions("das-dennis", len(model['F']), n_partitions=12)),
                     n_neighbors=15, # 5
                     prob_neighbor_mating=0.7, # 0.3
-                    sampling=PathSampling(),
+                    sampling=path_sampling,
                     mutation=path_mutation,
                     crossover=path_crossover,
                     # eliminate_duplicates=path_eliminate_duplicates,
-                    # repair=path_repair
+                    repair=path_repair
                 ),
 
     'NSGA3' : NSGA3(
-                    pop_size=pop_size,
                     ref_dirs=get_reference_directions("das-dennis", len(model['F']), n_partitions=12),
+                    pop_size=len(get_reference_directions("das-dennis", len(model['F']), n_partitions=12)),
+                    # pop_size=pop_size,
                     n_neighbors=15,
                     prob_neighbor_mating=0.7,
-                    sampling=PathSampling(),
+                    sampling=path_sampling,
                     mutation=path_mutation,
                     crossover=path_crossover,
                     eliminate_duplicates=path_eliminate_duplicates,
-                    # repair=path_repair,
+                    repair=path_repair,
                     # termination=path_termination
                         ),
 
     'USNGA3' : UNSGA3(
                     ref_dirs=np.array([[0.7, 0.9, 0.2, 0], [0.5, 0.7, 0.4, 0], [0.8, 0.9, 0.4, 0]]),
-                    pop_size=126,
+                    # pop_size=pop_size,
+                    pop_size = len(np.array([[0.7, 0.9, 0.2, 0], [0.5, 0.7, 0.4, 0], [0.8, 0.9, 0.4, 0]])),
                     sampling=PathSampling(),
                     mutation=path_mutation,
                     crossover=path_crossover,
@@ -126,7 +129,7 @@ algorithm_dict = {
     #                     ),
 
     'SMSEMOA' : SMSEMOA(
-                    pop_size=126,
+                    pop_size=pop_size,
                     sampling=PathSampling(),
                     mutation=path_mutation,
                     crossover=path_crossover,
