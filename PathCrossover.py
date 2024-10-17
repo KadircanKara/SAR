@@ -280,7 +280,7 @@ def ox_crossover(p1: PathSolution, p2: PathSolution):
     fill_offspring(offspring_1, p2_path, start, end)
     fill_offspring(offspring_2, p1_path, start, end)
 
-    return PathSolution(offspring_1, p1.start_points, info), PathSolution(offspring_2, p2.start_points, info)
+    return PathSolution(offspring_1, p1.start_points, info), PathSolution(offspring_2, p2.start_points, info)# , PathSolution(offspring_1, p2.start_points, info), PathSolution(offspring_2, p1.start_points, info)
 
 '''def ox_crossover(p1:PathSolution, p2:PathSolution):
 
@@ -566,7 +566,8 @@ class PathCrossover(Crossover):
             
             if random.random() <= self.prob:
                 if random.random() <= self.ox_prob:
-                    Y[0,i,0], Y[1,i,0] = ox_crossover(X[0, i, 0],X[1, i, 0])
+                    Y[0,i,0], Y[1,i,0]  = ox_crossover(X[0, i, 0],X[1, i, 0])
+                    # Y[0,i,0], Y[1,i,0], Y[2,i,0], Y[3,i,0],  = ox_crossover(X[0, i, 0],X[1, i, 0])
                 else:
                     Y[0,i,0], Y[1,i,0] = scx_crossover(X[0, i, 0],X[1, i, 0])
             else:

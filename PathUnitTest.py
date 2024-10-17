@@ -22,6 +22,10 @@ from PathInput import *
 from FilePaths import *
 from FileManagement import save_as_pickle, load_pickle
 
+from pymoo.termination.default import DefaultTermination, DefaultMultiObjectiveTermination
+from pymoo.core.termination import Termination
+from PathTermination import PathDefaultMultiObjectiveTermination
+
 
 class PathUnitTest(object):
 
@@ -59,7 +63,9 @@ class PathUnitTest(object):
 
         problem = PathProblem(info)
         algorithm = PathAlgorithm(self.algorithm)()
-        termination = ("n_gen", n_gen)
+        # default_termination = DefaultTermination(algorithm.x, algorithm.cv, algorithm.f, n_max_gen=n_gen)
+        # termination = DefaultMultiObjectiveTermination()
+        termination = ('n_gen', n_gen)
         output = PathOutput(problem)
 
         res, F, X, R = None, None, None, None,

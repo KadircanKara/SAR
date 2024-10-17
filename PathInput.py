@@ -15,7 +15,7 @@ model = time_conn_disconn_nsga3_model
 
 # ALG
 pop_size = 100
-n_gen = 3000
+n_gen = 1350
 
 """
 
