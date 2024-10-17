@@ -566,8 +566,7 @@ class PathCrossover(Crossover):
             
             if random.random() <= self.prob:
                 if random.random() <= self.ox_prob:
-                    Y[0,i,0], Y[1,i,0]  = ox_crossover(X[0, i, 0],X[1, i, 0])
-                    # Y[0,i,0], Y[1,i,0], Y[2,i,0], Y[3,i,0],  = ox_crossover(X[0, i, 0],X[1, i, 0])
+                    Y[0,i,0], Y[1,i,0] = ox_crossover(X[0, i, 0],X[1, i, 0])
                 else:
                     Y[0,i,0], Y[1,i,0] = scx_crossover(X[0, i, 0],X[1, i, 0])
             else:

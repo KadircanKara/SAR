@@ -29,6 +29,7 @@ class PathRepair(Repair):
 
         calculate_connectivity = "Percentage Connectivity" in problem.model["F"]
         calculate_disconnectivity = "Mean Disconnected Time" in problem.model["F"] or "Max Disconnected Time" in problem.model["F"]
+        calculate_tbv = "Max Mean TBV as Objective" in problem.model["F"] or "Max Mean TBV as Constraint" in problem.model["G"]
         # print(calculate_connectivity,calculate_disconnectivity)
         # print("Repair Handling")
         
@@ -47,7 +48,7 @@ class PathRepair(Repair):
 
             # print(f"new path: {new_path}")
 
-            X[k, 0] = PathSolution(new_path, np.copy(sol.start_points), sol.info, calculate_pathplan=True, calculate_connectivity=calculate_connectivity, calculate_disconnectivity=calculate_disconnectivity)
+            X[k, 0] = PathSolution(new_path, np.copy(sol.start_points), sol.info, calculate_pathplan=True, calculate_tbv=calculate_tbv, calculate_connectivity=calculate_connectivity, calculate_disconnectivity=calculate_disconnectivity)
 
             # print(f"New Path Length: {len(new_path)}")
 

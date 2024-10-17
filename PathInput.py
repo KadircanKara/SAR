@@ -11,11 +11,11 @@ from pymoo.core.duplicate import NoDuplicateElimination
 # CHANGE ALGORITHM INPUTS FROM HERE !!!
 
 # MODEL
-model = time_conn_disconn_nsga3_model
+model = time_conn_disconn_tbv_nsga3_model
 
 # ALG
-pop_size = 100
-n_gen = 1350
+pop_size = 400
+n_gen = 3000
 
 """
 

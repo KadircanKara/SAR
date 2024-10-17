@@ -96,8 +96,8 @@ algorithm_dict = {
 
     'NSGA3' : NSGA3(
                     ref_dirs=get_reference_directions("das-dennis", len(model['F']), n_partitions=12),
-                    pop_size=len(get_reference_directions("das-dennis", len(model['F']), n_partitions=12)),
-                    # pop_size=pop_size,
+                    # pop_size=len(get_reference_directions("das-dennis", len(model['F']), n_partitions=12)),
+                    pop_size=pop_size,
                     n_neighbors=15,
                     prob_neighbor_mating=0.7,
                     sampling=path_sampling,
@@ -151,6 +151,7 @@ class PathAlgorithm(object):
         print("-->", self.algorithm)
 
         if self.algorithm == 'NSGA3':
+            # print(len(algorithm_dict['NSGA3'].ref_dirs))
             return algorithm_dict['NSGA3']
 
         elif self.algorithm == 'MOEAD':

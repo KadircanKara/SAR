@@ -47,7 +47,7 @@ class PathSolution():
             f"Objective Values: totaldistance_{self.total_distance}_longestSubtour_{self.longest_subtour}_percentageConumber_of_nodesectivity_{self.percentage_connectivity}\n" \
             f"Chromosome: pathSequenumber_of_cellse_{self.path}_startPoints_{self.start_points}"
 
-    def __init__(self, path, start_points,  info:PathInfo, calculate_pathplan=False, calculate_connectivity=False, calculate_disconnectivity=False):
+    def __init__(self, path, start_points,  info:PathInfo, calculate_pathplan=False, calculate_tbv=False, calculate_connectivity=False, calculate_disconnectivity=False):
 
         # self.hovering = info.hovering
         # self.realtime_conumber_of_nodesectivity = info.realtime_conumber_of_nodesectivity
@@ -67,6 +67,10 @@ class PathSolution():
         # Time
         self.time_slots = None
         self.mission_time = 0
+        self.visit_times = None
+        self.tbv = None
+        self.mean_tbv = None
+        self.max_mean_tbv = None
         # Distance
         self.subtour_lengths = None
         self.total_distance = None
@@ -89,6 +93,13 @@ class PathSolution():
         if calculate_pathplan:
             self.get_drone_dict()
             self.get_pathplan() # Calculates drone dict and path matrix (not interpolated, directly from the path sequenumber_of_cellse and start points)
+
+        if calculate_tbv:
+            self.get_visit_times()
+            self.calculate_tbv()
+            self.calculate_mean_tbv()
+
+            
         
         if calculate_connectivity:
             # print("connectivity calculations")
@@ -243,6 +254,39 @@ class PathSolution():
 
         self.time_slots = self.real_time_path_matrix.shape[1]
 
+
+    def get_visit_times(self):
+        info = self.info
+        drone_path_matrix = self.real_time_path_matrix[1:,:]
+        visit_times = [[] for _ in range(info.number_of_cells)]
+        # print(f"Path Matrix:\n{drone_path_matrix}")
+        for cell in range(info.number_of_cells):
+            # print(f"cell {cell} visit steps: {np.where(sol.real_time_path_matrix==cell)[1].tolist()}")
+            visit_times[cell] = np.sort(np.where(drone_path_matrix==cell)[1])[:info.min_visits] # Last bit is to exclude hovering steps
+
+        # print("visit times:", visit_times)
+
+        self.visit_times = visit_times
+
+        return visit_times
+    
+    def calculate_tbv(self):
+        tbv = [np.diff(x) for x in self.visit_times]
+        self.tbv = tbv
+
+        # print("tbv:", tbv)
+
+        return tbv
+    
+    def calculate_mean_tbv(self):
+        mean_tbv = list(map(lambda x: np.mean(x), self.tbv))
+        self.mean_tbv = mean_tbv
+        self.max_mean_tbv = max(self.mean_tbv)
+
+        # print("mean tbv:", mean_tbv)
+        return self.mean_tbv
+
+    
 
     def do_connectivity_calculations(self):
 
@@ -413,6 +457,14 @@ def interpolate_between_cities(sol:PathSolution, city_prev, city):
     # print(f"city prev: {city_prev}, city: {city}, mid cities: {interpolated_path}")
     
     return interpolated_path
+
+def calculate_tbv(visit_times):
+    # print(visit_times)
+    tbv = [np.diff(x) for x in visit_times]
+    return tbv
+
+def calculate_mean_tbv(tbv):
+    return list(map(lambda x: np.mean(x), tbv))
 
 
 '''

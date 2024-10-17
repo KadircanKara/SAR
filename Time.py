@@ -5,6 +5,21 @@ from scipy.io import savemat
 from statistics import median_low
 from copy import deepcopy
 
+def max_tbv_as_constraint(sol:PathSolution):
+# print(sol.mean_tbv)
+    if sol.info.min_visits > 1:
+        return max(sol.mean_tbv) - 8
+    else:
+       return 0
+
+def max_tbv_as_objective(sol:PathSolution):
+# print(sol.mean_tbv)
+    if sol.info.min_visits > 1:
+        return max(sol.mean_tbv)
+    else:
+       return 0
+
+
 def calculate_max_visits(sol:PathSolution):
     info = sol.info
     xs, ys = get_real_paths(sol)

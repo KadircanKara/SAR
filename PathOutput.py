@@ -33,6 +33,7 @@ class PathOutput(Output):
         self.best_mean_disconn = None
         self.best_max_disconn = None
         self.best_disconn = None
+        self.best_max_mean_tbv = None
 
         # self.min_dist = None
         # self.max_dist = None
@@ -93,6 +94,10 @@ class PathOutput(Output):
         if "Percentage Disconnectivity" in objs:
             self.best_disconn = Column("best_disconn", width=17)
             self.columns += [self.best_disconn]
+
+        if "Max Mean TBV as Objective" in objs:
+            self.best_max_mean_tbv = Column("best_max_mean_tbv", width=17)
+            self.columns += [self.best_max_mean_tbv]
 
 
         # FROM MULTI
@@ -164,6 +169,10 @@ class PathOutput(Output):
             self.best_disconn.set(min(mean_disconn_values))
             # self.max_maxDisconnectedTime.set(max(mean_disconn_values))
             # self.mean_maxDisconnectedTime.set(np.mean(mean_disconn_values))
+
+        if self.best_max_mean_tbv:
+            max_mean_tbv_values = [sol[0].max_mean_tbv for sol in sols]
+            self.best_max_mean_tbv.set(min(max_mean_tbv_values))
 
         if self.best_subtour:
             subtour_values = [sol[0].longest_subtour for sol in sols]

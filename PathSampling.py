@@ -52,7 +52,7 @@ class PathSampling(Sampling):
             # print(f"path: {min(path), max(path)}")
             # Random start points
             start_points = sorted(random.sample([i for i in range(1, len(path))], problem.info.number_of_drones - 1))
-            start_points.insert(0, 0) # [0,4,8,12]
+            start_points.insert(0, 0)
             # print(f"Path: {path}\nStart Points: {start_points}")
             # print("----------------------------------------------------------------------------------------------------")
             # print(f"Sample {i}")
@@ -61,7 +61,7 @@ class PathSampling(Sampling):
             # print(f"Path: {path}")
             # print("Start Points: ", start_points)
 
-            X[i, :] = PathSolution(path, start_points, problem.info, calculate_pathplan=False, calculate_connectivity=False, calculate_disconnectivity=False)
+            X[i, :] = PathSolution(path, start_points, problem.info, calculate_pathplan=False, calculate_tbv=False, calculate_connectivity=False, calculate_disconnectivity=False)
 
         return X
 
