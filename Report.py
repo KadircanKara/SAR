@@ -253,13 +253,17 @@ def plot_time_between_visits_vs_dist_to_bs(info:PathInfo, show=False, save=True)
 
 # if __name__ == "__main":
 
-# plot_time_between_visits_vs_number_of_drones(model=time_conn_disconn_nsga2_model, r_values=[2, 2*sqrt(2), 4], numbers_of_drones=[4,8,12,16], numbers_of_visits=[2,3], show=True, save=False)
-
-comm_cell_range_values = [2, 2*sqrt(2), 4]
-for r in comm_cell_range_values:
-    plot_best_objs_for_nvisits(r, numbers_of_drones=[4,8,12,16], numbers_of_visits=[1,2,3], show=True, save=False)
+"""Plot TBV vs Number of Drones"""
+plot_time_between_visits_vs_number_of_drones(model=time_conn_disconn_tbv_nsga2_model, r_values=[2, 2*sqrt(2), 4], numbers_of_drones=[4,8,12,16], numbers_of_visits=[2,3], show=True, save=False)
 
 
+"""Plot Objs"""
+# comm_cell_range_values = [2, 2*sqrt(2), 4]
+# for r in comm_cell_range_values:
+#     plot_best_objs_for_nvisits(r, numbers_of_drones=[4,8,12,16], numbers_of_visits=[1,2,3], show=True, save=False)
+
+
+"""Plot TBV vs Dist to BS"""
     # info = PathInfo()
     # numbers_of_drones_values = [4,8,12,16]
     # comm_cell_range_values = [2, 2*sqrt(2), 4]

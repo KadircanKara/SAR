@@ -4,16 +4,18 @@ from FileManagement import load_pickle
 from PathAnimation import *
 from PathAlgorithm import *
 from PathOptimizationModel import *
+from PathInput import *
+from main import scenario
 
 # info = PathInfo(scenario)
 # model = info.model
 # scenario = str(info)
 
-
-scenario = "MOO_NSGA2_time_conn_disconn_g_8_a_50_n_8_v_2.5_r_2_minv_3_maxv_5_Nt_1_tarPos_12_ptdet_0.99_pfdet_0.01_detTh_0.9_maxIso_0"
+info:PathInfo = PathInfo(scenario)
+scenario_name = str(info)
 direction = "Best"
-obj = "Percentage_Connectivity"
-sol = load_pickle(f"Results/Solutions/{scenario}-{direction}-{obj}-Solution.pkl")
+obj = "Percentage_Connectivity" # Max_Mean_TBV_as_Objective
+sol = load_pickle(f"Results/Solutions/{scenario_name}-{direction}-{obj}-Solution.pkl")
 info:PathInfo = sol.info
 # print(f"Percentage Connectivity: {sol.percentage_connectivity}\nDrone Speed Violations: {calculate_drone_speed_violations(sol)}\nDrone Tracebacks: {calculate_drone_tracebacks(sol)}")
 fig, axis = plt.subplots()

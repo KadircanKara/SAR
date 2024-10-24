@@ -248,7 +248,7 @@ class PathMutation(Mutation):
 
 
             if np.random.random() < self.mutation_info["all_sp_mutation"][0]:
-                for _ in range (self.mutation_info["all_sp_mutation"][0]):
+                for _ in range (self.mutation_info["all_sp_mutation"][1]):
                     mut_start_points = all_sp_mutation(mut_path, mut_start_points)
                     # num_mut = random.randint(0, problem.info.number_of_drones)
                     # possible_sp_inds = np.arange(1, floor(len(mut_start_points)/4)).tolist()

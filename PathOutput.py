@@ -34,6 +34,7 @@ class PathOutput(Output):
         self.best_max_disconn = None
         self.best_disconn = None
         self.best_max_mean_tbv = None
+        self.best_sv = None
 
         # self.min_dist = None
         # self.max_dist = None
@@ -98,6 +99,11 @@ class PathOutput(Output):
         if "Max Mean TBV as Objective" in objs:
             self.best_max_mean_tbv = Column("best_max_mean_tbv", width=17)
             self.columns += [self.best_max_mean_tbv]
+
+        if "Path Speed Violations as Objective" in objs:
+            self.best_sv = Column("best_sv", width=17)
+            self.columns += [self.best_sv]
+
 
 
         # FROM MULTI
@@ -173,6 +179,11 @@ class PathOutput(Output):
         if self.best_max_mean_tbv:
             max_mean_tbv_values = [sol[0].max_mean_tbv for sol in sols]
             self.best_max_mean_tbv.set(min(max_mean_tbv_values))
+
+        if self.best_sv:
+            sv_values = [sol[0].path_speed_violations for sol in sols]
+            self.best_sv.set(min(sv_values))
+
 
         if self.best_subtour:
             subtour_values = [sol[0].longest_subtour for sol in sols]
