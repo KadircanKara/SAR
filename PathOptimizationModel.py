@@ -3,9 +3,9 @@ time_conn_disconn_tbv_nsga2_model = {
     'Type': 'MOO',
     'Exp':'time_conn_disconn_tbv',
     'Alg': "NSGA2",
-    'F': ['Mission Time', 'Percentage Connectivity', 'Mean Disconnected Time','Max Disconnected Time', 'Max Mean TBV as Objective', 'Path Speed Violations as Objective'], # 'Mean Disconnected Time','Max Disconnected Time','Percentage Disconnectivity' 'Total Drone Speed Violations as Objective'
-    'G': ['Max Mission Time', 'Min Percentage Connectivity', 'Max Mean TBV as Constraint'], # 'Min Percentage Connectivity','Max Mission Time', 'Max Mission Time','Max Mean TBV as Constraint'
-    'H': [] # 'No Long Jumps' 'Hovering Drones Full Connectivity' 'Search Drone Path Smoothness' 'Speed Violation Smoothness'
+    'F': ['Mission Time', 'Percentage Connectivity', 'Mean Disconnected Time','Max Disconnected Time', 'Max Mean TBV as Objective'], # 'Mean Disconnected Time','Max Disconnected Time','Percentage Disconnectivity' 'Total Drone Speed Violations as Objective'
+    'G': ['Max Mission Time', 'Min Percentage Connectivity'], # 'Min Percentage Connectivity','Max Mission Time', 'Max Mission Time','Max Mean TBV as Constraint'
+    'H': ['Path Speed Violations as Constraint'] # 'No Long Jumps' 'Hovering Drones Full Connectivity' 'Search Drone Path Smoothness' 'Speed Violation Smoothness'
 }
 time_conn_disconn_tbv_nsga3_model = {
     'Type': 'MOO',

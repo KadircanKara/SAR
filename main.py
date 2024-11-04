@@ -17,10 +17,10 @@ from PathInput import *
 scenario = {
                         'grid_size': 8,
                         'cell_side_length': 50,
-                        'number_of_drones': 8, # n=12, r=2*sqrt(2), n_visits=1
+                        'number_of_drones': 20, # n=12, r=2*sqrt(2), n_visits=1
                         'max_drone_speed': 2.5, # m/s
-                        'comm_cell_range': 4,  # 4 cells
-                        'min_visits': 2,  # Minimum number of cell visits
+                        'comm_cell_range': 2*sqrt(2),  # 4 cells
+                        'min_visits': 3,  # Minimum number of cell visits
                         'max_visits':5, # Maximum number of cell visits
                         'number_of_targets': 1,
                         'target_positions':12,
@@ -84,7 +84,7 @@ path_mutation = PathMutation({
                     # "reverse sequence": (0.3, 1),
                     "block inversion": (0, 1),
                     # "shift": (0.3, 1),
-                    "random_one_sp_mutation": (0.9, 1), # 1.0 for 4 drones |  0.95 for 8 drones | 0.7 for 12 drones | 0.5 for 16 drones
+                    "random_one_sp_mutation": (0.95, 1), # 1.0 for 4 drones |  0.95 for 8 drones | 0.7 for 12 drones | 0.5 for 16 drones
                     "random_n_sp_mutation": (0.0, 1), # 1.0 for 4 drones |  0.95 for 8 drones | 0.7 for 12 drones | 0.5 for 16 drones
                     "all_sp_mutation": (0.0, 1), # 1.0 for 4 drones |  0.95 for 8 drones | 0.7 for 12 drones | 0.5 for 16 drones
                     "longest_path_sp_mutation": (0.0, 1), # 1.0 for 4 drones |  0.95 for 8 drones | 0.7 for 12 drones | 0.5 for 16 drones
@@ -92,7 +92,7 @@ path_mutation = PathMutation({
                 })
 
 # CROSSOVER
-path_crossover = PathCrossover(prob=0.9, ox_prob=1.0)
+path_crossover = PathCrossover(prob=0.9, ox_prob=1.0, n_offsprings=2)
 
 # REPAIR
 path_repair = PathRepair()

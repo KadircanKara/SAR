@@ -33,7 +33,7 @@ class PathOutput(Output):
         self.best_mean_disconn = None
         self.best_max_disconn = None
         self.best_disconn = None
-        self.best_max_mean_tbv = None
+        self.max_mean_tbv_info = None
         self.best_sv = None
 
         # self.min_dist = None
@@ -97,8 +97,8 @@ class PathOutput(Output):
             self.columns += [self.best_disconn]
 
         if "Max Mean TBV as Objective" in objs:
-            self.best_max_mean_tbv = Column("best_max_mean_tbv", width=17)
-            self.columns += [self.best_max_mean_tbv]
+            self.max_mean_tbv_info = Column("max_mean_tbv_info", width=17)
+            self.columns += [self.max_mean_tbv_info]
 
         if "Path Speed Violations as Objective" in objs:
             self.best_sv = Column("best_sv", width=17)
@@ -176,9 +176,9 @@ class PathOutput(Output):
             # self.max_maxDisconnectedTime.set(max(mean_disconn_values))
             # self.mean_maxDisconnectedTime.set(np.mean(mean_disconn_values))
 
-        if self.best_max_mean_tbv:
+        if self.max_mean_tbv_info:
             max_mean_tbv_values = [sol[0].max_mean_tbv for sol in sols]
-            self.best_max_mean_tbv.set(min(max_mean_tbv_values))
+            self.max_mean_tbv_info.set((round(min(max_mean_tbv_values), 1), round(max(max_mean_tbv_values), 1)))
 
         if self.best_sv:
             sv_values = [sol[0].path_speed_violations for sol in sols]

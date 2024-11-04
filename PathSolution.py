@@ -283,7 +283,7 @@ class PathSolution():
         self.mean_tbv = mean_tbv
         self.max_mean_tbv = max(self.mean_tbv)
 
-        # print("mean tbv:", mean_tbv)
+        # print("mean tbv:", mean_tbv, "max mean tbv:", max(mean_tbv))
         return self.mean_tbv
 
     

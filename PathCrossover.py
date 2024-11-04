@@ -244,7 +244,7 @@ def scx_crossover(p1:PathSolution, p2:PathSolution):
 
 
 # Ordered Crossover (2-offsprings)
-def ox_crossover(p1: PathSolution, p2: PathSolution):
+def ox_crossover(p1: PathSolution, p2: PathSolution, n_offsprings:int):
     
     info = p1.info
     p1_path = p1.path
@@ -280,7 +280,10 @@ def ox_crossover(p1: PathSolution, p2: PathSolution):
     fill_offspring(offspring_1, p2_path, start, end)
     fill_offspring(offspring_2, p1_path, start, end)
 
-    return PathSolution(offspring_1, p1.start_points, info), PathSolution(offspring_2, p2.start_points, info)# , PathSolution(offspring_1, p2.start_points, info), PathSolution(offspring_2, p1.start_points, info)
+    if n_offsprings == 2:
+        return PathSolution(offspring_1, p1.start_points, info), PathSolution(offspring_2, p2.start_points, info)# , PathSolution(offspring_1, p2.start_points, info), PathSolution(offspring_2, p1.start_points, info)
+    elif n_offsprings == 4:
+        return PathSolution(offspring_1, p1.start_points, info), PathSolution(offspring_2, p2.start_points, info), PathSolution(offspring_1, p2.start_points, info), PathSolution(offspring_2, p1.start_points, info)
 
 '''def ox_crossover(p1:PathSolution, p2:PathSolution):
 
@@ -534,6 +537,7 @@ class PathCrossover(Crossover):
         # return Y
 
 '''
+
 class PathCrossover(Crossover):
 
 
@@ -566,10 +570,19 @@ class PathCrossover(Crossover):
             
             if random.random() <= self.prob:
                 if random.random() <= self.ox_prob:
-                    Y[0,i,0], Y[1,i,0] = ox_crossover(X[0, i, 0],X[1, i, 0])
+                    if self.n_offsprings == 2:
+                        Y[0,i,0], Y[1,i,0] = ox_crossover(X[0, i, 0],X[1, i, 0], n_offsprings=self.n_offsprings)
+                    elif self.n_offsprings == 4:
+                        Y[0,i,0], Y[1,i,0], Y[2,i,0], Y[3,i,0], = ox_crossover(X[0, i, 0],X[1, i, 0], n_offsprings=self.n_offsprings)
                 else:
-                    Y[0,i,0], Y[1,i,0] = scx_crossover(X[0, i, 0],X[1, i, 0])
+                    if self.n_offsprings == 2:
+                        Y[0,i,0], Y[1,i,0] = scx_crossover(X[0, i, 0],X[1, i, 0])
+                    elif self.n_offsprings == 4:
+                        Y[0,i,0], Y[1,i,0], Y[2,i,0], Y[3,i,0] = scx_crossover(X[0, i, 0],X[1, i, 0])
             else:
-                Y[0,i,0], Y[1,i,0] = X[0, i, 0],X[1, i, 0]
+                if self.n_offsprings == 2:
+                    Y[0,i,0], Y[1,i,0] = X[0, i, 0],X[1, i, 0]
+                elif self.n_offsprings == 4:
+                    Y[0,i,0], Y[1,i,0], Y[2,i,0], Y[3,i,0] = X[0, i, 0],X[1, i, 0], X[0, i, 0],X[1, i, 0]
 
         return Y

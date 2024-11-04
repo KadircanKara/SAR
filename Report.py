@@ -65,10 +65,11 @@ def calculate_var_of_mean_tbv(sol:PathSolution):
 
 
 
-def plot_best_objs_for_nvisits(r, numbers_of_drones:list, numbers_of_visits:list, show=False, save=True):
+def plot_best_objs_for_nvisits(model, r, numbers_of_drones:list, numbers_of_visits:list, show=False, save=True):
 
     # directions = ["Best", "Mid", "Worst"]
     info_dict=PathInfo()
+    info_dict.model = model
     info_dict.comm_cell_range = r
 
     y_values_list = [ dict() for _ in range(len(numbers_of_visits))]
@@ -132,6 +133,8 @@ def plot_best_objs_for_nvisits(r, numbers_of_drones:list, numbers_of_visits:list
 def plot_time_between_visits_vs_number_of_drones(model:dict, r_values:list, numbers_of_drones:list, numbers_of_visits:list, show=True, save=False):
     """Take the best objective solutions for the required scenarios and plot tbv vs number of drones"""
 
+    filepath = "Figures/Time Between Visits/Extreme Point Distributions/"
+
     assert (1 not in numbers_of_visits), "1 Should not be in numbers of visits"
 
     x = numbers_of_drones
@@ -183,6 +186,11 @@ def plot_time_between_visits_vs_number_of_drones(model:dict, r_values:list, numb
             ax.legend()
 
             # plt.show()
+
+            if save:
+                fig.savefig(f"{filepath}{save_as}-{dir}-{objective_with_underscore}-mean_tbv_dist.png")
+                fig.savefig(f"{filepath}{save_as}-{dir}-{objective_with_underscore}-mean_tbv_hist.png")
+
 
     if show:
         plt.show()
@@ -254,13 +262,14 @@ def plot_time_between_visits_vs_dist_to_bs(info:PathInfo, show=False, save=True)
 # if __name__ == "__main":
 
 """Plot TBV vs Number of Drones"""
-plot_time_between_visits_vs_number_of_drones(model=time_conn_disconn_tbv_nsga2_model, r_values=[2, 2*sqrt(2), 4], numbers_of_drones=[4,8,12,16], numbers_of_visits=[2,3], show=True, save=False)
+# plot_time_between_visits_vs_number_of_drones(model=time_conn_disconn_tbv_nsga2_model, r_values=[2, 2*sqrt(2), 4], numbers_of_drones=[4,8,12,16], numbers_of_visits=[2,3], show=False, save=True)
 
 
 """Plot Objs"""
-# comm_cell_range_values = [2, 2*sqrt(2), 4]
-# for r in comm_cell_range_values:
-#     plot_best_objs_for_nvisits(r, numbers_of_drones=[4,8,12,16], numbers_of_visits=[1,2,3], show=True, save=False)
+model = time_conn_disconn_tbv_nsga2_model
+comm_cell_range_values = [2]
+for r in comm_cell_range_values:
+    plot_best_objs_for_nvisits(model, r, numbers_of_drones=[4,8,12,16], numbers_of_visits=[2,3], show=True, save=False)
 
 
 """Plot TBV vs Dist to BS"""

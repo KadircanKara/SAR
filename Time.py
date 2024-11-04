@@ -8,7 +8,7 @@ from copy import deepcopy
 def max_tbv_as_constraint(sol:PathSolution):
 # print(sol.mean_tbv)
     if sol.info.min_visits > 1:
-        return max(sol.mean_tbv) - 8
+        return max(sol.mean_tbv) - 40
     else:
        return 0
 
