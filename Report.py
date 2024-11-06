@@ -8,26 +8,6 @@ from PathInfo import *
 from collections import defaultdict
 
 import os
-import shutil
-
-'''def zip_folders(folder1, folder2, )
-# Paths of folders to compress
-folder1 = '/path/to/folder1'
-folder2 = '/path/to/folder2'
-
-# Temporary directory to copy folders for compression
-temp_dir = '/path/to/temp_dir'
-
-# Copy both folders to a temporary directory
-shutil.copytree(folder1, os.path.join(temp_dir, 'folder1'))
-shutil.copytree(folder2, os.path.join(temp_dir, 'folder2'))
-
-# Create the archive (choose zip or tar)
-shutil.make_archive('combined_archive', 'zip', temp_dir)
-
-# Cleanup: Optionally, remove the temporary folder after compression
-shutil.rmtree(temp_dir)
-'''
 
 def get_visit_times(sol:PathSolution):
     info = sol.info
@@ -47,22 +27,17 @@ def calculate_tbv(visit_times):
 def calculate_mean_tbv(tbv):
     return list(map(lambda x: np.mean(x), tbv))
 
-# def calculate_mean_tbv(sol:PathSolution):
-#     info = sol.info
-#     drone_path_matrix = sol.real_time_path_matrix[1:,:]
-#     visit_times = [[] for _ in range(info.number_of_cells)]
-#     tbv = visit_times.copy()
-#     # print(f"Path Matrix:\n{drone_path_matrix}")
-#     for cell in range(info.number_of_cells):
-#         # print(f"cell {cell} visit steps: {np.where(sol.real_time_path_matrix==cell)[1].tolist()}")
-#         visit_times[cell] = np.sort(np.where(drone_path_matrix==cell)[1])[:info.min_visits] # Last bit is to exclude hovering steps
-#         tbv[cell] = np.diff(visit_times[cell])
-#     # return visit_times, list(map(lambda x: np.mean(x), tbv))
-#     return list(map(lambda x: np.mean(x), tbv))
-
 def calculate_var_of_mean_tbv(sol:PathSolution):
     mean_tbv = get_visit_times(sol)
 
+
+
+def model_comparison_heatmap_for_best_objs(models:list, r, numbers_of_drones:list, numbers_of_visits:list, show=True, save=False):
+    """Plot a heatmap for comparison of the best objective values of the models for different numbers of drones and visits"""
+    # TODO: Load the best objective values for the models
+    # TODO: Create a heatmap for each objective
+    # TODO: Save the heatmap
+    return -1
 
 
 def plot_best_objs_for_nvisits(model, r, numbers_of_drones:list, numbers_of_visits:list, show=False, save=True):
@@ -262,25 +237,26 @@ def plot_time_between_visits_vs_dist_to_bs(info:PathInfo, show=False, save=True)
 # if __name__ == "__main":
 
 """Plot TBV vs Number of Drones"""
-# plot_time_between_visits_vs_number_of_drones(model=time_conn_disconn_tbv_nsga2_model, r_values=[2, 2*sqrt(2), 4], numbers_of_drones=[4,8,12,16], numbers_of_visits=[2,3], show=False, save=True)
+# plot_time_between_visits_vs_number_of_drones(model=time_conn_disconn_tbv_nsga2_model, r_values=[2, 2*sqrt(2), 4], numbers_of_drones=[4,8,12,16], numbers_of_visits=[2,3], show=True, save=False)
 
 
 """Plot Objs"""
 model = time_conn_disconn_tbv_nsga2_model
 comm_cell_range_values = [2]
 for r in comm_cell_range_values:
-    plot_best_objs_for_nvisits(model, r, numbers_of_drones=[4,8,12,16], numbers_of_visits=[2,3], show=True, save=False)
+    plot_best_objs_for_nvisits(model, r, numbers_of_drones=[4,8,12,16], numbers_of_visits=[1,2,3], show=True, save=False)
 
 
 """Plot TBV vs Dist to BS"""
-    # info = PathInfo()
-    # numbers_of_drones_values = [4,8,12,16]
-    # comm_cell_range_values = [2, 2*sqrt(2), 4]
-    # min_visits_values = [2,3]
-    # for n in numbers_of_drones_values:
-    #     info.number_of_drones = n
-    #     for r in comm_cell_range_values:
-    #         info.comm_cell_range = r
-    #         for v in min_visits_values:
-    #             info.min_visits = v
-    #             plot_time_between_visits_vs_dist_to_bs(info=info, show=False, save=True)
+# info = PathInfo()
+# info.model = time_conn_disconn_tbv_nsga2_model
+# numbers_of_drones_values = [4,8,12,16]
+# comm_cell_range_values = [2, 2*sqrt(2), 4]
+# min_visits_values = [2,3]
+# for n in numbers_of_drones_values:
+#     info.number_of_drones = n
+#     for r in comm_cell_range_values:
+#         info.comm_cell_range = r
+#         for v in min_visits_values:
+#             info.min_visits = v
+#             plot_time_between_visits_vs_dist_to_bs(info=info, show=True, save=False)

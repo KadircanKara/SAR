@@ -17,10 +17,10 @@ from PathInput import *
 scenario = {
                         'grid_size': 8,
                         'cell_side_length': 50,
-                        'number_of_drones': 20, # n=12, r=2*sqrt(2), n_visits=1
+                        'number_of_drones': 16, # n=12, r=2*sqrt(2), n_visits=1
                         'max_drone_speed': 2.5, # m/s
-                        'comm_cell_range': 2*sqrt(2),  # 4 cells
-                        'min_visits': 3,  # Minimum number of cell visits
+                        'comm_cell_range': 2,  # 4 cells
+                        'min_visits': 1,  # Minimum number of cell visits
                         'max_visits':5, # Maximum number of cell visits
                         'number_of_targets': 1,
                         'target_positions':12,

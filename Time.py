@@ -4,6 +4,7 @@ from Distance import *
 from scipy.io import savemat
 from statistics import median_low
 from copy import deepcopy
+from math import inf
 
 def max_tbv_as_constraint(sol:PathSolution):
 # print(sol.mean_tbv)

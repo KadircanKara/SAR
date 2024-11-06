@@ -15,7 +15,7 @@ model = time_conn_disconn_tbv_nsga2_model
 
 # ALG
 pop_size = 300
-n_gen = 779 #650
+n_gen = 1000 #650
 
 # 1000 gen for 20 drones 3 visits
 
