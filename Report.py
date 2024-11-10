@@ -34,9 +34,14 @@ def calculate_var_of_mean_tbv(sol:PathSolution):
 
 def model_comparison_heatmap_for_best_objs(models:list, r, numbers_of_drones:list, numbers_of_visits:list, show=True, save=False):
     """Plot a heatmap for comparison of the best objective values of the models for different numbers of drones and visits"""
-    # TODO: Load the best objective values for the models
-    # TODO: Create a heatmap for each objective
-    # TODO: Save the heatmap
+    # TODO: Iterate through the scenario parameters - IP
+    for n in numbers_of_drones:
+        for v in numbers_of_visits:
+            pass
+            
+    # TODO: Load the best objective values for the models - IP
+    # TODO: Create a heatmap for each objective - IP
+    # TODO: Save the heatmap - IP
     return -1
 
 
@@ -92,8 +97,8 @@ def plot_best_objs_for_nvisits(model, r, numbers_of_drones:list, numbers_of_visi
             y = y_values_list[i][objective]
             ax.scatter(x, y, label=f'{v} Visit(s)')
             # Annotate Scatter Plot
-            for i in range(len(x)):
-                ax.annotate(f'{round(y[i], 2)}', (x[i], y[i]), textcoords="offset points", xytext=(0,5), ha='center')
+            for j in range(len(x)):
+                ax.annotate(f'{round(y[j], 2)}', (x[j], y[j]), textcoords="offset points", xytext=(0,5), ha='center')
             ax.plot(x, y)
         # Add a legend to the plot
         ax.legend()
@@ -108,7 +113,7 @@ def plot_best_objs_for_nvisits(model, r, numbers_of_drones:list, numbers_of_visi
 def plot_time_between_visits_vs_number_of_drones(model:dict, r_values:list, numbers_of_drones:list, numbers_of_visits:list, show=True, save=False):
     """Take the best objective solutions for the required scenarios and plot tbv vs number of drones"""
 
-    filepath = "Figures/Time Between Visits/Extreme Point Distributions/"
+    filepath = "Figures/Time Between Visits/Mean Mean TBV vs Number of Drones/"
 
     assert (1 not in numbers_of_visits), "1 Should not be in numbers of visits"
 
@@ -118,7 +123,10 @@ def plot_time_between_visits_vs_number_of_drones(model:dict, r_values:list, numb
 
     # y_values_list = [ np.zeros(len(numbers_of_drones)) for _ in range(len(numbers_of_visits))]
 
-    best_solutions_filenames = [x for x in os.listdir("Results/Solutions") if "SolutionObjects" not in x and "Best" in x]
+    model_parameters_str = f"{model['Type']}_{model['Alg']}_{model['Exp']}"
+    model_solutions_filenames = [x for x in os.listdir("Results/Solutions") if model_parameters_str in x]
+    best_solutions_filenames = [x for x in model_solutions_filenames if "Best" in x]
+    # best_solutions_filenames = [x for x in os.listdir("Results/Solutions") if "SolutionObjects" not in x and "Best" in x]
     objective_names = model["F"] # list(set([x.split("-")[2].replace("_", " ") for x in best_solutions_filenames]))
     best_solutions = [load_pickle(f"{solutions_filepath}{x}") for x in best_solutions_filenames]
     infos_of_best_solutions = [x.info for x in best_solutions]
@@ -126,15 +134,19 @@ def plot_time_between_visits_vs_number_of_drones(model:dict, r_values:list, numb
     # n_12_filenames = [x for x in best_solutions_filenames if "n_12" in x and "r_2" in x and "r_2*sqrt(2)" not in x and "Mission_Time" in x]
     # print(np.array(n_12_filenames))
 
+    # fmts = ['o', 's', '^', 'x', 'D', 'P', 'H', 'v', '<', '>', 'd', 'p', '*', 'X', '+', '|', '_', '.', ',']
+
     for r_comm in r_values:
         for obj in objective_names:
-            fig, ax = plt.subplots()
+            objective_with_underscore = obj.replace(" ", "_")
+            fig, ax = plt.subplots(figsize=(7,5))
             ax.set_xticks(numbers_of_drones)
             ax.grid()
             for n_visits in numbers_of_visits:
+                # fmt = fmts[numbers_of_visits.index(n_visits)]
                 y = []
+                max_values = []
                 for n_drones in numbers_of_drones:
-                    
                     print(obj, n_drones, r_comm, n_visits)
                     n_drones_r_comm_n_visits_best_obj_solution = [
                                                                     best_solutions[i] for i in range(len(best_solutions)) if infos_of_best_solutions[i].model["F"]==model["F"] # Filter model parameters
@@ -146,30 +158,40 @@ def plot_time_between_visits_vs_number_of_drones(model:dict, r_values:list, numb
                                                                     and infos_of_best_solutions[i].comm_cell_range==r_comm # Filter scenario parameters
                                                                     and obj.replace(" ","_") in best_solutions_filenames[i] # Filter objective
                                                                 ][0]
+                    n_drones_r_comm_n_visits_best_obj_info = n_drones_r_comm_n_visits_best_obj_solution.info
+                    scenario = str(n_drones_r_comm_n_visits_best_obj_info)
                     # Get cumulative mean
-                    vt = get_visit_times(n_drones_r_comm_n_visits_best_obj_solution)
-                    tbv = calculate_tbv(vt)
-                    mean_tbv = [np.mean(x) for x in tbv]
+                    # vt = get_visit_times(n_drones_r_comm_n_visits_best_obj_solution)
+                    # tbv = calculate_tbv(vt)
+                    # mean_tbv = [np.mean(x) for x in tbv]
+                    mean_tbv = n_drones_r_comm_n_visits_best_obj_solution.mean_tbv
                     cum_mean_tbv = np.mean(mean_tbv)
                     # Append cumulative mean tbv to y
                     y.append(cum_mean_tbv)
                 # Scatter Plot
                 ax.scatter(x, y)
                 ax.plot(x, y, label=f"{n_visits} visit(s)")
-                
-            ax.set_title(f"n: {n_drones}, r: {sp.sqrt(round(r_comm**2))} Best {obj} Solution Cumulative Mean TBV", fontsize="medium")
-            ax.legend()
+                # Add Error Bars
+                variance = np.var(y)
+                std_dev = np.sqrt(variance)
+                # ax.errorbar(x, y, yerr=std_dev, fmt="x", capsize=5, label=f'{n_visits} visit(s) error bar')
+                # Add shaded variance area
+                ax.fill_between(x, y - variance, y + variance, alpha=0.2, label=f"{n_visits} visit(s) variance")
+                max_values.append(max(y))
 
-            # plt.show()
+            
+            max_value = max(max_values)
+            # ax.set_ylim([0, max_value+1])
+            ax.set_title(f"Best {obj} Solution Cumulative Mean TBV vs Number of Drones with Variance", fontsize="small")
+            ax.legend(loc='upper right', ncol=2, fontsize="small")
+
+            # plt.tight_layout()
+
+            if show:
+                plt.show()
 
             if save:
-                fig.savefig(f"{filepath}{save_as}-{dir}-{objective_with_underscore}-mean_tbv_dist.png")
-                fig.savefig(f"{filepath}{save_as}-{dir}-{objective_with_underscore}-mean_tbv_hist.png")
-
-
-    if show:
-        plt.show()
-
+                fig.savefig(f"{filepath}{scenario}-Best-{objective_with_underscore}-mean_tbv_vs_number_of_drones_with_variance.png")
 
 def plot_time_between_visits_vs_dist_to_bs(info:PathInfo, show=False, save=True):
 
@@ -234,17 +256,42 @@ def plot_time_between_visits_vs_dist_to_bs(info:PathInfo, show=False, save=True)
                 plt.show()
 
 
+def plot_mean_mean_tbv_vs_number_of_drones_with_variance_for_extreme_points(model:dict, comm_cell_ranges, numbers_of_drones, numbers_of_visits, show=True, save=False):
+    """Plot the mean mean tbv vs number of drones with variance"""
+    # TODO: Convert comm_cell_ranges, numbers_of_drones, numbers_of_visits to lists if they are not - DONE
+    if not isinstance(comm_cell_ranges, list):
+        comm_cell_ranges = [comm_cell_ranges]
+    if not isinstance(numbers_of_drones, list):
+        numbers_of_drones = [numbers_of_drones]
+    if not isinstance(numbers_of_visits, list):
+        numbers_of_visits = [numbers_of_visits]
+
+    # TODO: Filter the best solutions for the model - DONE
+    model_parameters_str = f"{model['Type']}_{model['Alg']}_{model['Exp']}"
+    model_solutions_filenames = [x for x in os.listdir("Results/Solutions") if model_parameters_str in x]
+    best_solutions_filenames = [x for x in model_solutions_filenames if "Best" in x]
+    objective_names = model["F"]
+    best_solutions = [load_pickle(f"{solutions_filepath}{x}") for x in best_solutions_filenames]
+    infos_of_best_solutions = [x.info for x in best_solutions]
+
+    # TODO: Iterate through parameters - IP
+    for r in comm_cell_ranges:
+        for n in numbers_of_drones:
+            for v in numbers_of_visits:
+                pass
+
+    
 # if __name__ == "__main":
 
 """Plot TBV vs Number of Drones"""
-# plot_time_between_visits_vs_number_of_drones(model=time_conn_disconn_tbv_nsga2_model, r_values=[2, 2*sqrt(2), 4], numbers_of_drones=[4,8,12,16], numbers_of_visits=[2,3], show=True, save=False)
+plot_time_between_visits_vs_number_of_drones(model=time_conn_disconn_tbv_nsga2_model, r_values=[2, 2*sqrt(2), 4], numbers_of_drones=[4,8,12,16], numbers_of_visits=[2,3], show=False, save=True)
 
 
 """Plot Objs"""
-model = time_conn_disconn_tbv_nsga2_model
-comm_cell_range_values = [2]
-for r in comm_cell_range_values:
-    plot_best_objs_for_nvisits(model, r, numbers_of_drones=[4,8,12,16], numbers_of_visits=[1,2,3], show=True, save=False)
+# model = time_conn_disconn_tbv_nsga2_model
+# comm_cell_range_values = [2]
+# for r in comm_cell_range_values:
+#     plot_best_objs_for_nvisits(model, r, numbers_of_drones=[4,8,12,16], numbers_of_visits=[1,2,3], show=True, save=False)
 
 
 """Plot TBV vs Dist to BS"""
