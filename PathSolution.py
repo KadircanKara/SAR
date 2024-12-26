@@ -49,6 +49,10 @@ class PathSolution():
 
     def __init__(self, path, start_points,  info:PathInfo, calculate_pathplan=False, calculate_tbv=False, calculate_connectivity=False, calculate_disconnectivity=False):
 
+        self.calculate_tbv = calculate_tbv
+        self.calculate_connectivity = calculate_connectivity
+        self.calculate_disconnectivity = calculate_disconnectivity
+
         # self.hovering = info.hovering
         # self.realtime_conumber_of_nodesectivity = info.realtime_conumber_of_nodesectivity
 
@@ -66,7 +70,8 @@ class PathSolution():
 
         # Time
         self.time_slots = None
-        self.mission_time = 0
+        self.mission_time = None
+        self.time_elapsed_at_steps = None
         self.visit_times = None
         self.tbv = None
         self.mean_tbv = None
@@ -96,8 +101,8 @@ class PathSolution():
 
         if calculate_tbv:
             self.get_visit_times()
-            self.calculate_tbv()
-            self.calculate_mean_tbv()
+            self.get_tbv()
+            self.get_mean_tbv()
 
             
         
@@ -144,7 +149,7 @@ class PathSolution():
         info = self.info
 
         # GET CELL MATRIX
-        self.path_matrix = np.zeros((info.number_of_drones+1, self.time_slots), dtype=int) - 1 # number_of_drones+1 bc. of BS (inumber_of_dronesex 0)
+        self.path_matrix = np.zeros((info.number_of_drones+1, self.time_slots), dtype=int) - 1
         for i in range(info.number_of_drones):
             if len(self.drone_dict[i]) == self.time_slots: # If this is the longest discrete tour drone
                 self.path_matrix[i+1] = self.drone_dict[i]
@@ -156,15 +161,15 @@ class PathSolution():
         self.real_time_path_matrix = self.path_matrix
 
         # Set Mission Time
-        drone_path_matrix = self.real_time_path_matrix[1:,:].T
-        max_distances_at_steps = []
-        while(len(max_distances_at_steps) < drone_path_matrix.shape[0] - 1):
-            step_prev = drone_path_matrix[0]
-            step = drone_path_matrix[1]
-            # print(step_prev, step)
-            max_distances_at_steps.append( max([info.D[step_prev[i], step[i]] for i in range(info.number_of_drones)]) )
-            drone_path_matrix = np.delete(arr=drone_path_matrix, obj=0, axis=0)
-        self.mission_time = sum(max_distances_at_steps) / info.max_drone_speed
+        # drone_path_matrix = self.real_time_path_matrix[1:,:].T
+        # max_distances_at_steps = []
+        # while(len(max_distances_at_steps) < drone_path_matrix.shape[0] - 1):
+        #     step_prev = drone_path_matrix[0]
+        #     step = drone_path_matrix[1]
+        #     # print(step_prev, step)
+        #     max_distances_at_steps.append( max([info.D[step_prev[i], step[i]] for i in range(info.number_of_drones)]) )
+        #     drone_path_matrix = np.delete(arr=drone_path_matrix, obj=0, axis=0)
+        # self.mission_time = sum(max_distances_at_steps) / info.max_drone_speed
 
 
         # Set Total Distance and Longest Subtour
@@ -185,69 +190,94 @@ class PathSolution():
 
         # APPLY HOVERING TO DRONES WITH SHORTER PATHS (ONLY IF MOO)
 
-        if info.model != time_ga_model:
+        # if info.model != time_ga_model:
 
-            # drone_dict = {k:v for k,v in self.drone_dict.items() if k!=-1}
-            # print(f"Dict Values Object: {list(drone_dict.items())}")
-            path_lens = [len(path) for path in list(self.drone_dict.values())]
-            # hovering_drone_ids = [path_lens.index(i) for i in path_lens if i != max(path_lens)]
-            # hovering_drone_ids = [i for i in range(info.number_of_drones) if i != path_lens.index(max(path_lens))]
-            # Get Hovering Drones
-            hovering_drone_ids = []
-            shift = 0
-            path_lens_temp = path_lens.copy()
-            while len(path_lens_temp) > 0:
-                if path_lens_temp[0] != max(path_lens):
-                    hovering_drone_ids.append(shift)
-                shift += 1
-                path_lens_temp.pop(0)
-            self.hovering_drones = hovering_drone_ids
-            # print(f"Path Lens: {path_lens}")
-            # print(f"Hovering Drone IDs: {hovering_drone_ids}")
-            for drone in hovering_drone_ids:
-                # print("----------------------------------------------------------")
-                # print(f"Drone {drone}:")
-                # print("----------------------------------------------------------")
-                # APPLY HOVERING
-                path_without_hovering = self.real_time_path_matrix[drone+1].copy()
-                # Find last cell
-                hovering_cell_idx = np.where(path_without_hovering==-1)[0][1] - 1
-                hovering_cell = path_without_hovering[hovering_cell_idx]
-                # print(f"Hovering Cell Idx: {hovering_cell_idx}, Hovering Cell: {hovering_cell}")
-                hovering_component = np.array([hovering_cell] * (len(path_without_hovering) - hovering_cell_idx - 1))
-                # print(f"Hovering Component: {hovering_component}")
-                path_with_hovering = path_without_hovering.copy()
-                # path_with_hovering = np.insert(path_with_hovering, )
-                path_with_hovering[hovering_cell_idx:len(path_without_hovering)-1] = hovering_component
-                self.real_time_path_matrix[drone+1] = path_with_hovering
-            # INTERPOLATE PATH BACK TO BS AFTER HOVERING
-            # print("Iniitial Path Matrix:\n", self.real_time_path_matrix)
-            drone_interpolated_last_step_list = []
-            for drone in range(info.number_of_drones):
-                drone_interpolated_last_step = interpolate_between_cities(self, self.real_time_path_matrix[drone+1][-2], 0)
-                if self.real_time_path_matrix[drone+1][-2] != 0:
-                    drone_interpolated_last_step = drone_interpolated_last_step[1:]
-                # print("-->", drone_interpolated_last_step)
-                drone_interpolated_last_step_list.append(drone_interpolated_last_step)
-            max_interpolated_last_step_len = max([len(x) for x in drone_interpolated_last_step_list])
+        # drone_dict = {k:v for k,v in self.drone_dict.items() if k!=-1}
+        # print(f"Dict Values Object: {list(drone_dict.items())}")
+        path_lens = [len(path) for path in list(self.drone_dict.values())]
+        # hovering_drone_ids = [path_lens.index(i) for i in path_lens if i != max(path_lens)]
+        # hovering_drone_ids = [i for i in range(info.number_of_drones) if i != path_lens.index(max(path_lens))]
+        # Get Hovering Drones
+        hovering_drone_ids = []
+        shift = 0
+        path_lens_temp = path_lens.copy()
+        while len(path_lens_temp) > 0:
+            if path_lens_temp[0] != max(path_lens):
+                hovering_drone_ids.append(shift)
+            shift += 1
+            path_lens_temp.pop(0)
+        self.hovering_drones = hovering_drone_ids
+        # print(f"Path Lens: {path_lens}")
+        # print(f"Hovering Drone IDs: {hovering_drone_ids}")
+        for drone in hovering_drone_ids:
+            # print("----------------------------------------------------------")
+            # print(f"Drone {drone}:")
+            # print("----------------------------------------------------------")
+            # APPLY HOVERING
+            path_without_hovering = self.real_time_path_matrix[drone+1].copy()
+            # Find last cell
+            hovering_cell_idx = np.where(path_without_hovering==-1)[0][1] - 1
+            hovering_cell = path_without_hovering[hovering_cell_idx]
+            # print(f"Hovering Cell Idx: {hovering_cell_idx}, Hovering Cell: {hovering_cell}")
+            hovering_component = np.array([hovering_cell] * (len(path_without_hovering) - hovering_cell_idx - 1))
+            # print(f"Hovering Component: {hovering_component}")
+            path_with_hovering = path_without_hovering.copy()
+            # path_with_hovering = np.insert(path_with_hovering, )
+            path_with_hovering[hovering_cell_idx:len(path_without_hovering)-1] = hovering_component
+            self.real_time_path_matrix[drone+1] = path_with_hovering
+        # INTERPOLATE PATH BACK TO BS AFTER HOVERING
+        # print("Iniitial Path Matrix:\n", self.real_time_path_matrix)
+        drone_interpolated_last_step_list = []
+        for drone in range(info.number_of_drones):
+            drone_interpolated_last_step = interpolate_between_cities(self, self.real_time_path_matrix[drone+1][-2], 0)
+            if self.real_time_path_matrix[drone+1][-2] != 0:
+                drone_interpolated_last_step = drone_interpolated_last_step[1:]
+            # print("-->", drone_interpolated_last_step)
+            drone_interpolated_last_step_list.append(drone_interpolated_last_step)
+        max_interpolated_last_step_len = max([len(x) for x in drone_interpolated_last_step_list])
 
-            # print(drone_interpolated_last_step_list)
+        # print(drone_interpolated_last_step_list)
 
-            for drone in range(info.number_of_drones):
-                if len(drone_interpolated_last_step_list[drone]) < max_interpolated_last_step_len:
-                    # print("Old Last Step:", drone_interpolated_last_step_list[drone])
-                    drone_interpolated_last_step_list[drone].extend([drone_interpolated_last_step_list[drone][-1]] * (max_interpolated_last_step_len - len(drone_interpolated_last_step_list[drone])))
-                    # print("New Last Step:", drone_interpolated_last_step_list[drone])
-                    # print(drone_interpolated_last_step_list[i])
-                # self.real_time_path_matrix[drone+1] = np.insert(self.real_time_path_matrix, -1, drone_interpolated_last_step_list[i])
-            # print("Final Last Steps:", drone_interpolated_last_step_list)
-            drone_interpolated_path_array = np.insert(np.array(drone_interpolated_last_step_list), 0, np.full((1,max_interpolated_last_step_len), -1, dtype=int), axis=0)
-            # print(drone_interpolated_path_array)
-            # print(np.array(drone_interpolated_last_step_list))
-            # print(np.array(drone_interpolated_last_step_list).shape, self.real_time_path_matrix.shape)
-            # print(self.real_time_path_matrix.shape, drone_interpolated_path_array.shape)
-            self.real_time_path_matrix = np.hstack((self.real_time_path_matrix[:,:-1], drone_interpolated_path_array, np.full((info.number_of_nodes,1), -1, dtype=int)))
-            # self.real_time_path_matrix = np.insert(self.real_time_path_matrix, -1, drone_interpolated_path_array, axis=1)
+        for drone in range(info.number_of_drones):
+            if len(drone_interpolated_last_step_list[drone]) < max_interpolated_last_step_len:
+                # print("Old Last Step:", drone_interpolated_last_step_list[drone])
+                drone_interpolated_last_step_list[drone].extend([drone_interpolated_last_step_list[drone][-1]] * (max_interpolated_last_step_len - len(drone_interpolated_last_step_list[drone])))
+                # print("New Last Step:", drone_interpolated_last_step_list[drone])
+                # print(drone_interpolated_last_step_list[i])
+            # self.real_time_path_matrix[drone+1] = np.insert(self.real_time_path_matrix, -1, drone_interpolated_last_step_list[i])
+        # print("Final Last Steps:", drone_interpolated_last_step_list)
+        drone_interpolated_path_array = np.insert(np.array(drone_interpolated_last_step_list), 0, np.full((1,max_interpolated_last_step_len), -1, dtype=int), axis=0)
+        # print(drone_interpolated_path_array)
+        # print(np.array(drone_interpolated_last_step_list))
+        # print(np.array(drone_interpolated_last_step_list).shape, self.real_time_path_matrix.shape)
+        # print(self.real_time_path_matrix.shape, drone_interpolated_path_array.shape)
+        self.real_time_path_matrix = np.hstack((self.real_time_path_matrix[:,:-1], drone_interpolated_path_array, np.full((info.number_of_nodes,1), -1, dtype=int)))
+        # self.real_time_path_matrix = np.insert(self.real_time_path_matrix, -1, drone_interpolated_path_array, axis=1)
+
+        # Calculate Mission Time
+        mission_time = 0
+        time_elapsed_at_steps = []
+        real_time_drone_path_matrix = self.real_time_path_matrix[1:,:].T
+        for i in range(real_time_drone_path_matrix.shape[0]-1):
+            drone_step_dists=[]
+            # diagonal_path_exists=False
+            drone_positions = real_time_drone_path_matrix[i]
+            next_drone_positions = real_time_drone_path_matrix[i+1]
+            for drone_no in range(len(drone_positions)):
+                drone_step_dists.append(info.D[drone_positions[drone_no], next_drone_positions[drone_no]])
+            max_dist_at_step = max(drone_step_dists)
+            time_elapsed = max_dist_at_step / info.max_drone_speed
+            mission_time += time_elapsed
+            time_elapsed_at_steps.append(time_elapsed)
+            #     if info.D[drone_positions[drone_no], next_drone_positions[drone_no]] > info.cell_side_length:
+            #         diagonal_path_exists=True
+            #         break
+            # time_elapsed = info.cell_side_length*sqrt(2) / info.max_drone_speed if diagonal_path_exists else info.cell_side_length / info.max_drone_speed
+            # mission_time += time_elapsed
+            # time_elapsed_at_steps.append(time_elapsed)
+
+        self.mission_time = mission_time
+        self.time_elapsed_at_steps = time_elapsed_at_steps
 
         # print("Final Path Matrix:\n", self.real_time_path_matrix)
 
@@ -270,16 +300,38 @@ class PathSolution():
 
         return visit_times
     
-    def calculate_tbv(self):
-        tbv = [np.diff(x) for x in self.visit_times]
+    def get_tbv(self):
+
+        debug_mode = False
+
+        real_time_tbv = []
+
+        if self.info.min_visits > 1:
+            # Calculate REAL-TIME TBV instead of timestep TBV
+            for cell_visit_steps in self.visit_times:
+                print("cell visit steps:", cell_visit_steps) if debug_mode else None
+                real_time_tbv.append([]) # Initialize the list for the cell
+                for step in range(len(cell_visit_steps)-1):
+                    current_step = cell_visit_steps[step]
+                    next_step = cell_visit_steps[step+1]
+                    real_time_tbv[-1].append(sum(self.time_elapsed_at_steps[current_step:next_step+1]))
+                print("real time tbv:", real_time_tbv[-1]) if debug_mode else None
+
+
+            tbv = [np.diff(x) for x in self.visit_times]
+        else:
+            tbv = [[0] for _ in range(self.info.number_of_cells)]
+            real_time_tbv = tbv.copy()
+
         self.tbv = tbv
+        self.real_time_tbv = real_time_tbv
 
         # print("tbv:", tbv)
 
-        return tbv
+        return real_time_tbv
     
-    def calculate_mean_tbv(self):
-        mean_tbv = list(map(lambda x: np.mean(x), self.tbv))
+    def get_mean_tbv(self):
+        mean_tbv = list(map(lambda x: np.mean(x), self.real_time_tbv))
         self.mean_tbv = mean_tbv
         self.max_mean_tbv = max(self.mean_tbv)
 
@@ -353,15 +405,6 @@ class PathSolution():
 
         return self.percentage_disconnectivity
 
-
-
-        info = self.info
-        path_matrix = self.real_time_path_matrix[1:,:].transpose()
-        cell_visit_steps = dict()
-        for i in range(info.number_of_cells):
-            cell_visit_steps[i] = np.where(path_matrix==i)[0] # Steps at which the cell is visited
-
-        self.cell_visit_steps = cell_visit_steps
 
 
     def get_coords(self, cell):

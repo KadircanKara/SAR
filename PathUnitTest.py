@@ -55,6 +55,8 @@ class PathUnitTest(object):
 
                 if animation:
                     animate_extreme_point_paths(info)
+
+                print(f"Scenario: {str(info)} COMPLETED !!!")
             else:
                 print(f"Scenario: {str(info)} NO SOLUTION FOUND !!!")
 
@@ -86,9 +88,24 @@ class PathUnitTest(object):
         t_elapsed_seconds = t_end - t_start
 
         if res.X is not None:
-            print(res.X)
+            # print(res.X)
             X = res.X
             F= pd.DataFrame(abs(res.F), columns=model['F'])
             R = t_elapsed_seconds
+            # If certain attributes are missing from the solution objects, add them here
+            sample_sol = X[0][0] if isinstance(X[0], np.ndarray) else X[0]
+            # Add TBV and Disconnecivity attributes to the solution objects if they are not already calculated
+            for row in X:
+                if isinstance(row, np.ndarray):
+                    sol = row[0]
+                else:
+                    sol = row
+                if not sample_sol.calculate_tbv:
+                    sol.get_visit_times()
+                    sol.get_tbv()
+                    sol.get_mean_tbv()
+                if not sample_sol.calculate_disconnectivity:
+                    sol.do_disconnectivity_calculations()
+
 
         return res, F,X,R

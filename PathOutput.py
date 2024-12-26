@@ -66,11 +66,11 @@ class PathOutput(Output):
             # self.mean_dist = Column("mean_dist", width=len("mean_dist"))
             self.columns += [self.best_dist]
 
-        if "Mission Time" in objs:
+        if "Mission Time" in objs or "Mission Time and Percentage Connectivity Weighted Sum" in objs :
             self.best_time = Column("best_time", width=width)
             self.columns += [self.best_time]
 
-        if "Percentage Connectivity" in objs:
+        if "Percentage Connectivity" in objs or "Mission Time and Percentage Connectivity Weighted Sum" in objs:
             self.best_conn = Column("best_conn", width=width)
             self.columns += [self.best_conn]
 
@@ -96,7 +96,7 @@ class PathOutput(Output):
             self.best_disconn = Column("best_disconn", width=17)
             self.columns += [self.best_disconn]
 
-        if "Max Mean TBV as Objective" in objs:
+        if "Max Mean TBV" in objs or "Mission Time and Percentage Connectivity and Max Mean TBV Weighted Sum" in objs:
             self.max_mean_tbv_info = Column("max_mean_tbv_info", width=17)
             self.columns += [self.max_mean_tbv_info]
 

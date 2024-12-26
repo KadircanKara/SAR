@@ -24,7 +24,7 @@ def limit_cell_range(sol:PathSolution):
 def max_mission_time(sol:PathSolution):
     # return sol.mission_time - (sol.info.min_visits * 1000)
     if sol.info.min_visits < 4:
-        return sol.mission_time - 1800
+        return sol.mission_time - 3600
     else:
         return sol.mission_time - (sol.info.min_visits * 600)
 

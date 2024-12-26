@@ -74,7 +74,8 @@ class PathInfo(object):
 
         # print(f"comm cell range squared: {self.comm_cell_range**2}, sym: {sp.sqrt(int(self.comm_cell_range**2))}")
         if self.comm_cell_range == 2*sqrt(2):
-            comm_cell_range = sp.sqrt(round(self.comm_cell_range**2))
+            # comm_cell_range = sp.sqrt(round(self.comm_cell_range**2))
+            comm_cell_range = "sqrt(8)"
         else:
             comm_cell_range = self.comm_cell_range
 

@@ -1,127 +1,237 @@
-"""Mission Time, Percentage Connectivity, Max and Mean Disconnected Time, TBV MOO Models"""
-time_conn_disconn_tbv_nsga2_model = {
+# T MODELS
+T_SOO_GA = {
+    'Type': 'SOO',
+    'Exp': 'T',
+    'Alg': "GA",
+    'F': ['Mission Time'],
+    'G': ['Max Mission Time'],
+    'H': ['Path Speed Violations as Constraint']
+}
+
+
+# C MODELS
+C_SOO_GA = {
+    'Type': 'SOO',
+    'Exp': 'C',
+    'Alg': "GA",
+    'F': ['Percentage Connectivity'],
+    'G': ['Min Percentage Connectivity'],
+    'H': ['Path Speed Violations as Constraint']
+}
+
+
+# TC MODELS
+TC_SOO_GA_MODEL = {
+    'Type': 'SOO',
+    'Exp':'TC',
+    'Alg': "GA",
+    'F': ["Mission Time and Percentage Connectivity Weighted Sum"],
+    'G': ['Max Mission Time', 'Min Percentage Connectivity'],
+    'H': ['Path Speed Violations as Constraint']
+}
+TC_MOO_NSGA2 = {
     'Type': 'MOO',
-    'Exp':'time_conn_disconn_tbv',
+    'Exp':'TC',
     'Alg': "NSGA2",
-    'F': ['Mission Time', 'Percentage Connectivity', 'Mean Disconnected Time','Max Disconnected Time', 'Max Mean TBV as Objective'], # 'Mean Disconnected Time','Max Disconnected Time','Percentage Disconnectivity' 'Total Drone Speed Violations as Objective'
-    'G': ['Max Mission Time', 'Min Percentage Connectivity'], # 'Min Percentage Connectivity','Max Mission Time', 'Max Mission Time','Max Mean TBV as Constraint'
-    'H': ['Path Speed Violations as Constraint'] # 'No Long Jumps' 'Hovering Drones Full Connectivity' 'Search Drone Path Smoothness' 'Speed Violation Smoothness'
+    'F': ['Mission Time', 'Percentage Connectivity'],
+    'G': ['Min Percentage Connectivity', 'Max Mission Time'],
+    'H': ['Path Speed Violations as Constraint']
 }
-time_conn_disconn_tbv_nsga3_model = {
+TC_MOO_NSGA3 = {
     'Type': 'MOO',
-    'Exp':'time_conn_disconn_tbv',
+    'Exp':'TC',
     'Alg': "NSGA3",
-    'F': ['Mission Time', 'Percentage Connectivity', 'Mean Disconnected Time','Max Disconnected Time','Max Mean TBV as Objective'], # 'Mean Disconnected Time','Max Disconnected Time','Percentage Disconnectivity' 'Total Drone Speed Violations as Objective'
-    'G': ['Min Percentage Connectivity','Max Mission Time','Max Mean TBV as Constraint'], # 'Min Percentage Connectivity','Max Mission Time'
-    'H': ['Path Speed Violations as Constraint'] # 'No Long Jumps' 'Hovering Drones Full Connectivity' 'Search Drone Path Smoothness' 'Speed Violation Smoothness'
+    'F': ['Mission Time', 'Percentage Connectivity'],
+    'G': ['Min Percentage Connectivity', 'Max Mission Time'],
+    'H': ['Path Speed Violations as Constraint']
 }
-time_conn_disconn_tbv_moead_model = {
+TC_MOO_MOEAD = {
     'Type': 'MOO',
-    'Exp':'time_conn_disconn_tbv',
+    'Exp':'TC',
     'Alg': "MOEAD",
-    'F': ['Mission Time', 'Percentage Connectivity', 'Mean Disconnected Time','Max Disconnected Time', 'Path Speed Violations as Objective', 'Max Mean TBV as Objective'], # 'Mean Disconnected Time','Max Disconnected Time','Percentage Disconnectivity' 'Total Drone Speed Violations as Objective'
-    'G': [], # 'Min Percentage Connectivity','Max Mission Time'
-    'H': [] # 'No Long Jumps' 'Hovering Drones Full Connectivity' 'Search Drone Path Smoothness' 'Speed Violation Smoothness'
+    'F': ['Mission Time', 'Percentage Connectivity'],
+    'G': ['Min Percentage Connectivity', 'Max Mission Time'],
+    'H': ['Path Speed Violations as Constraint']
 }
+
+
+# TCT MODELS
+TCT_SOO_GA_MODEL = {
+    'Type': 'SOO',
+    'Exp':'TCT',
+    'Alg': "GA",
+    'F': ["Mission Time and Percentage Connectivity and Max Mean TBV Weighted Sum"],
+    'G': ['Max Mission Time', 'Min Percentage Connectivity'],
+    'H': ['Path Speed Violations as Constraint']
+}
+TCT_MOO_NSGA2 = {
+    'Type': 'MOO',
+    'Exp':'TCT',
+    'Alg': "NSGA2",
+    'F': ['Mission Time', 'Percentage Connectivity', 'Max Mean TBV'],
+    'G': ['Max Mission Time', 'Min Percentage Connectivity'],
+    'H': ['Path Speed Violations as Constraint']
+}
+TCT_MOO_NSGA3 = {
+    'Type': 'MOO',
+    'Exp':'TCT',
+    'Alg': "NSGA3",
+    'F': ['Mission Time', 'Percentage Connectivity', 'Max Mean TBV'],
+    'G': ['Max Mission Time', 'Min Percentage Connectivity'],
+    'H': ['Path Speed Violations as Constraint']
+}
+TCT_MOO_MOEAD = {
+    'Type': 'MOO',
+    'Exp':'TCT',
+    'Alg': "MOEAD",
+    'F': ['Mission Time', 'Percentage Connectivity', 'Max Mean TBV'],
+    'H': []
+}
+
+
+# TCDT MODELS
+TCDT_SOO_GA = {
+    'Type': 'SOO',
+    'Exp':'TCDT',
+    'Alg': "GA",
+    'F': ["Mission Time & Percentage Connectivity & Max Mean TBV & Max Disconnected Time & Mean Disconnected & Time Between Visits Weighted Sum"],
+    'G': ['Max Mission Time', 'Min Percentage Connectivity'],
+    'H': ['Path Speed Violations as Constraint']
+}
+TCDT_MOO_NSGA2 = {
+    'Type': 'MOO',
+    'Exp':'TCDT',
+    'Alg': "NSGA2",
+    'F': ['Mission Time', 'Percentage Connectivity', 'Mean Disconnected Time','Max Disconnected Time', 'Max Mean TBV'],
+    'G': ['Max Mission Time', 'Min Percentage Connectivity'],
+    'H': ['Path Speed Violations as Constraint']
+}
+TCDT_MOO_NSGA3 = {
+    'Type': 'MOO',
+    'Exp':'TCDT',
+    'Alg': "NSGA3",
+    'F': ['Mission Time', 'Percentage Connectivity', 'Mean Disconnected Time','Max Disconnected Time','Max Mean TBV'],
+    'G': ['Max Mission Time', 'Min Percentage Connectivity'],
+    'H': ['Path Speed Violations as Constraint']
+}
+TCDT_MOO_MOEAD = {
+    'Type': 'MOO',
+    'Exp':'TCDT',
+    'Alg': "MOEAD",
+    'F': ['Mission Time', 'Percentage Connectivity', 'Mean Disconnected Time','Max Disconnected Time', 'Path Speed Violations as Objective', 'Max Mean TBV'],
+    'G': [],
+    'H': []
+}
+
+
+# TCD MODELS
+TCD_SOO_GA = {
+    'Type': 'SOO',
+    'Exp':'TCD',
+    'Alg': "GA",
+    'F': ["Mission Time & Percentage Connectivity & Max Disconnected Time & Mean Disconnected Weighted Sum"],
+    'G': ['Path Speed Violations as Constraint', 'Max Mission Time', 'Min Percentage Connectivity'],
+    'H': []
+}
+TCD_MOO_NSGA2 = {
+    'Type': 'MOO',
+    'Exp':'TCD',
+    'Alg': "NSGA2",
+    'F': ['Mission Time', 'Percentage Connectivity', 'Mean Disconnected Time','Max Disconnected Time'],
+    'G': ['Path Speed Violations as Constraint', 'Max Mission Time', 'Min Percentage Connectivity'],
+    'H': []
+}
+TCD_MOO_NSGA3 = {
+    'Type': 'MOO',
+    'Exp':'TCD',
+    'Alg': "NSGA3",
+    'F': ['Mission Time', 'Percentage Connectivity', 'Mean Disconnected Time','Max Disconnected Time'],
+    'G': ['Min Percentage Connectivity','Max Mission Time'],
+    'H': ['Path Speed Violations as Constraint']
+}
+TCD_MOO_MOEAD = {
+    'Type': 'MOO',
+    'Exp':'TCD',
+    'Alg': "MOEAD",
+    'F': ['Mission Time', 'Percentage Connectivity', 'Mean Disconnected Time','Max Disconnected Time', 'Path Speed Violations as Objective'],
+    'G': [],
+    'H': []
+}
+
+
+# CD MODELS
+CD_SOO_GA = {
+    'Type': 'SOO',
+    'Exp': 'CD',
+    'Alg': "GA",
+    'F': ["Percentage Connectivity & Mean Disconnected Time & Max Disconnected Time Weighted Sum"],
+    'G': [],
+    'H': ['Path Speed Violations as Constraint']
+}
+CD_MOO_NSGA2 = {
+    'Type': 'MOO',
+    'Exp': 'CD',
+    'Alg': "NSGA2",
+    'F': ['Percentage Connectivity', 'Mean Disconnected Time','Max Disconnected Time'],
+    'G': [],
+    'H': ['Path Speed Violations as Constraint']
+}
+CD_MOO_NSGA3 = {
+    'Type': 'MOO',
+    'Exp': 'CD',
+    'Alg': "NSGA3",
+    'F': ['Percentage Connectivity', 'Mean Disconnected Time','Max Disconnected Time'],
+    'G': [],
+    'H': ['Path Speed Violations as Constraint']
+}
+CD_MOO_MOEAD = {
+    'Type': 'MOO',
+    'Exp': 'CD',
+    'Alg': "MOEAD",
+    'F': ['Percentage Connectivity', 'Mean Disconnected Time','Max Disconnected Time'],
+    'G': [],
+    'H': ['Path Speed Violations as Constraint']
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"""Mission Time, Percentage Connectivity, TBV MOO Models"""
+
+
+
+
+"""Mission Time, Percentage Connectivity, Max and Mean Disconnected Time, TBV MOO Models"""
+
 
 
 """Mission Time, Percentage Connectivity, Max and Mean Disconnected Time MOO Models"""
-time_conn_disconn_nsga2_model = {
-    'Type': 'MOO',
-    'Exp':'time_conn_disconn',
-    'Alg': "NSGA2",
-    'F': ['Mission Time', 'Percentage Connectivity', 'Mean Disconnected Time','Max Disconnected Time'], # 'Mean Disconnected Time','Max Disconnected Time','Percentage Disconnectivity' 'Total Drone Speed Violations as Objective'
-    'G': ['Path Speed Violations as Constraint', 'Max Mission Time', 'Min Percentage Connectivity'], # 'Min Percentage Connectivity','Max Mission Time'
-    'H': [] # 'No Long Jumps' 'Hovering Drones Full Connectivity' 'Search Drone Path Smoothness' 'Speed Violation Smoothness'
-}
-time_conn_disconn_nsga3_model = {
-    'Type': 'MOO',
-    'Exp':'time_conn_disconn',
-    'Alg': "NSGA3",
-    'F': ['Mission Time', 'Percentage Connectivity', 'Mean Disconnected Time','Max Disconnected Time'], # 'Mean Disconnected Time','Max Disconnected Time','Percentage Disconnectivity' 'Total Drone Speed Violations as Objective'
-    'G': ['Min Percentage Connectivity','Max Mission Time'], # 'Min Percentage Connectivity','Max Mission Time'
-    'H': ['Path Speed Violations as Constraint'] # 'No Long Jumps' 'Hovering Drones Full Connectivity' 'Search Drone Path Smoothness' 'Speed Violation Smoothness'
-}
-time_conn_disconn_moead_model = {
-    'Type': 'MOO',
-    'Exp':'time_conn_disconn',
-    'Alg': "MOEAD",
-    'F': ['Mission Time', 'Percentage Connectivity', 'Mean Disconnected Time','Max Disconnected Time', 'Path Speed Violations as Objective'], # 'Mean Disconnected Time','Max Disconnected Time','Percentage Disconnectivity' 'Total Drone Speed Violations as Objective'
-    'G': [], # 'Min Percentage Connectivity','Max Mission Time'
-    'H': [] # 'No Long Jumps' 'Hovering Drones Full Connectivity' 'Search Drone Path Smoothness' 'Speed Violation Smoothness'
-}
 
 
 
 """Mission Time, Percentage Connectivity MOO Models"""
-time_conn_nsga2_model = {
-    'Type': 'MOO',
-    'Exp':'time_conn',
-    'Alg': "NSGA2",
-    'F': ['Mission Time', 'Percentage Connectivity'], # 'Max Long Jumps per Drone'
-    'G': ['Min Percentage Connectivity', 'Max Mission Time'], # 'Limit Subtour Range' 'Limit Long Jumps'
-    'H': ['Speed Violations'] # 'No Long Jumps' 'Hovering Drones Full Connectivity'
-}
-time_conn_nsga3_model = {
-    'Type': 'MOO',
-    'Exp':'time_conn',
-    'Alg': "NSGA3",
-    'F': ['Mission Time', 'Percentage Connectivity'], # 'Max Long Jumps per Drone'
-    'G': ['Min Percentage Connectivity', 'Max Mission Time'], # 'Limit Subtour Range' 'Limit Long Jumps'
-    'H': ['Speed Violations'] # 'No Long Jumps' 'Hovering Drones Full Connectivity'
-}
-time_conn_moead_model = {
-    'Type': 'MOO',
-    'Exp':'time_conn',
-    'Alg': "MOEAD",
-    'F': ['Mission Time', 'Percentage Connectivity'], # 'Max Long Jumps per Drone'
-    'G': ['Min Percentage Connectivity', 'Max Mission Time'], # 'Limit Subtour Range' 'Limit Long Jumps'
-    'H': ['Speed Violations'] # 'No Long Jumps' 'Hovering Drones Full Connectivity'
-}
+
+
+
 
 
 
 """Percentage Connectivity, Max and Mean Disconnected Time MOO Models"""
-conn_disconn_nsga2_model = {
-    'Type': 'MOO',
-    'Exp': 'conn_disconn',
-    'Alg': "NSGA2",
-    'F': ['Percentage Connectivity', 'Mean Disconnected Time','Max Disconnected Time'],
-    'G': [],
-    'H': ['Total Drone Speed Violations as Constraint']  # 'No Long Jumps', 'No Extra Revisits', 'Number of Visits Hard Constraint'
-}
-conn_disconn_nsga3_model = {
-    'Type': 'MOO',
-    'Exp': 'conn_disconn',
-    'Alg': "NSGA3",
-    'F': ['Percentage Connectivity', 'Mean Disconnected Time','Max Disconnected Time'],
-    'G': [],
-    'H': ['Total Drone Speed Violations as Constraint']  # 'No Long Jumps', 'No Extra Revisits', 'Number of Visits Hard Constraint'
-}
-conn_disconn_moead_model = {
-    'Type': 'MOO',
-    'Exp': 'conn_disconn',
-    'Alg': "MOEAD",
-    'F': ['Percentage Connectivity', 'Mean Disconnected Time','Max Disconnected Time'],
-    'G': [],
-    'H': ['Total Drone Speed Violations as Constraint']  # 'No Long Jumps', 'No Extra Revisits', 'Number of Visits Hard Constraint'
-}
+
 
 
 """GA Models"""
-time_ga_model = {
-    'Type': 'SOO',
-    'Exp': 'time',
-    'Alg': "GA",
-    'F': ['Mission Time'],
-    'G': [],
-    'H': ['Path Speed Violations as Constraint']  # 'No Long Jumps', 'No Extra Revisits', 'Number of Visits Hard Constraint'
-}
-conn_ga_model = {
-    'Type': 'SOO',
-    'Exp': 'conn',
-    'Alg': "GA",
-    'F': ['Percentage Connectivity'],
-    'G': [],
-    'H': ['Total Drone Speed Violations as Constraint']  # 'No Long Jumps', 'No Extra Revisits', 'Number of Visits Hard Constraint'
-}
+

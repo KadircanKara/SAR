@@ -2,6 +2,7 @@ from Distance import *
 from Connectivity import *
 from Time import *
 from Smoothness import *
+from WeightedSum import * # mission_time_and_percentage_connectivity_ws, mission_time_and_percentage_connectivity_and_max_mean_tbv_ws
 
 from PathSolution import *
 
@@ -20,7 +21,10 @@ model_metric_info = {
     'Total Drone Speed Violations as Objective': total_drone_speed_violations_as_objective,
     'Path Speed Violations as Objective': path_speed_violations_as_objective,
     'Path Smoothness as Objective': path_smoothness_as_objective,
-    'Max Mean TBV as Objective': max_tbv_as_objective,
+    'Max Mean TBV': max_tbv_as_objective,
+    "Mission Time and Percentage Connectivity Weighted Sum": mission_time_and_percentage_connectivity_ws,
+    "Mission Time and Percentage Connectivity and Max Mean TBV Weighted Sum": mission_time_and_percentage_connectivity_and_max_mean_tbv_ws,
+    
 
 
     # Inequality Constraints

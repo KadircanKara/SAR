@@ -9,14 +9,14 @@ from math import inf
 def max_tbv_as_constraint(sol:PathSolution):
 # print(sol.mean_tbv)
     if sol.info.min_visits > 1:
-        return max(sol.mean_tbv) - 40
+        return sol.max_mean_tbv - 40
     else:
        return 0
 
 def max_tbv_as_objective(sol:PathSolution):
 # print(sol.mean_tbv)
     if sol.info.min_visits > 1:
-        return max(sol.mean_tbv)
+        return sol.max_mean_tbv
     else:
        return 0
 

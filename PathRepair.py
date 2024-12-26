@@ -27,9 +27,17 @@ class PathRepair(Repair):
 
     def _do(self, problem, X, **kwargs):
 
-        calculate_connectivity = "Percentage Connectivity" in problem.model["F"]
-        calculate_disconnectivity = "Mean Disconnected Time" in problem.model["F"] or "Max Disconnected Time" in problem.model["F"]
-        calculate_tbv = "Max Mean TBV as Objective" in problem.model["F"] or "Max Mean TBV as Constraint" in problem.model["G"]
+        calculate_connectivity = True
+
+        calculate_disconnectivity = "Max Disconnected Time" in problem.model["F"] or "Mean Disconnected Time" in problem.model["F"]
+        calculate_tbv = "Max Mean TBV" in problem.model["F"] or "Max Mean TBV as Constraint" in problem.model["G"]
+
+        # calculate_connectivity = True
+        # calculate_connectivity = "Percentage Connectivity" in problem.model["F"] or "Mission Time and Percentage Connectivity Weighted Sum" in problem.model["F"]
+        # calculate_disconnectivity = "Mean Disconnected Time" in problem.model["F"] or "Max Disconnected Time" in problem.model["F"]
+        # calculate_tbv = "Max Mean TBV" in problem.model["F"] or "Max Mean TBV as Constraint" in problem.model["G"] or "Mission Time and Percentage Connectivity and Max Mean TBV Weighted Sum" in problem.model["F"]
+
+        # calculate_connectivity, calculate_disconnectivity, calculate_tbv = True, True, True
         # print(calculate_connectivity,calculate_disconnectivity)
         # print("Repair Handling")
         
