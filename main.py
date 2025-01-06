@@ -11,20 +11,12 @@ from PathUnitTest import *
 import os
 from math import sqrt
 from PathInput import *
-# from playsound import playsound
-
-# Play sound file
-# playsound('path_to_your_sound_file.mp3')
-# import sympy as sp
 
 """Scenarios' SP Mutation Rates"""
 # ------------------------------------------------------------------------------------------------------------------
 # 0.95
 # ------------------------------------------------------------------------------------------------------------------
-# TCDT_MOO_NSGA2 : TCDT - 4 drones 1 visit all ranges, 8 drones 1 visit all ranges, 12 drones 2*sqrt(2) and 4 ranges, 
-# 4 drones, 1 visit, all ranges
-# 8 drones, 1 visit, all ranges
-# 12 drones, 1 visit, 2*sqrt(2) and 4 ranges
+# TCDT_MOO_NSGA2 : 4 drones 1 visit all ranges | 4 drones, 2 visits, all ranges | 8 drones 1 visit all ranges | 12 drones, 1 visit, 2*sqrt(2) and 4 ranges | 16 drones 1 visit all ranges
 # ------------------------------------------------------------------------------------------------------------------
 
 
@@ -32,8 +24,7 @@ from PathInput import *
 # ------------------------------------------------------------------------------------------------------------------
 # 0.75
 # ------------------------------------------------------------------------------------------------------------------
-# TCDT_MOO_NSGA2
-# 12 drones, 1 visit, 2 range 
+# TCDT_MOO_NSGA2 : 12 drones, 1 visit, 2 range
 # ------------------------------------------------------------------------------------------------------------------
 
 
@@ -85,9 +76,14 @@ scenario = {
                         'max_isolated_time': 0,
                         }
 
-number_of_drones_values = [12]
-comm_cell_range_values = [2]
-min_visits_values = [1]
+number_of_drones_values = [12,16]
+comm_cell_range_values = [2, 2*sqrt(2), 4]
+min_visits_values = [3,2,1]
+
+# TCD MOO
+# 4 drones: Mostly used 0.8 SP Mut Rate
+# 8 drones: Mostly used 0.2 SP Mut Rate
+# 12 drones: Mostly used 0.2 SP Mut Rate
 
 scenarios = []
 for v in min_visits_values:
@@ -141,7 +137,7 @@ path_mutation = PathMutation({
                     # "reverse sequence": (0.3, 1),
                     "block inversion": (0, 1),
                     # "shift": (0.3, 1),
-                    "random_one_sp_mutation": (0.75, 1), # 1.0 for 4 drones |  0.95 for 8 drones | 0.7 for 12 drones | 0.5 for 16 drones
+                    "random_one_sp_mutation": (0.5, 1), # 1.0 for 4 drones |  0.95 for 8 drones | 0.7 for 12 drones | 0.5 for 16 drones
                     "random_n_sp_mutation": (0.0, 1), # 1.0 for 4 drones |  0.95 for 8 drones | 0.7 for 12 drones | 0.5 for 16 drones
                     "all_sp_mutation": (0.0, 1), # 1.0 for 4 drones |  0.95 for 8 drones | 0.7 for 12 drones | 0.5 for 16 drones
                     "longest_path_sp_mutation": (0.0, 1), # 1.0 for 4 drones |  0.95 for 8 drones | 0.7 for 12 drones | 0.5 for 16 drones

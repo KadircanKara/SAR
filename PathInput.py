@@ -11,11 +11,11 @@ from pymoo.core.duplicate import NoDuplicateElimination
 # CHANGE ALGORITHM INPUTS FROM HERE !!!
 
 # MODEL
-model = TCDT_MOO_NSGA2
+model = TCD_MOO_NSGA2
 
 # ALG
-pop_size = 300
-n_gen = 700 #650
+pop_size = 200
+n_gen = 1000 #650
 
 # 1000 gen for 20 drones 3 visits
 
